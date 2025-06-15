@@ -18,7 +18,7 @@ export const navRoutes = [
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: '/', 
     element: <AppLayout />,
     children: navRoutes,
   },

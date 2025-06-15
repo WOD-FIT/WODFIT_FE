@@ -36,14 +36,6 @@ export default function Record() {
 
   return (
     <div className="min-h-screen bg-white px-4 py-6">
-      <header className="flex items-center justify-between mb-6">
-        <img src="/icons/Logo-column.svg" alt="Logo" className="h-10" />
-        <div className="flex gap-4">
-          <img src="/icons/bell.svg" className="w-6 h-6" />
-          <img src="/icons/setting.svg" className="w-6 h-6" />
-        </div>
-      </header>
-
       <div className="mb-4">
         <label className="block font-semibold mb-1">WOD Text</label>
         <textarea
