@@ -1,6 +1,9 @@
 // src/routes/router.tsx
 import { createBrowserRouter } from 'react-router-dom';
-import App from '../App';
+import AppLayout from '../layouts/AppLayout';
+import AuthLayout from '../layouts/AuthLayout';
+import Login from '../pages/Login';
+import Signup from '../pages/Signup';
 import Home from '../pages/Home';
 import Record from '../pages/Record';
 import Reservation from '../pages/Reservation';
@@ -16,7 +19,15 @@ export const navRoutes = [
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />,
+    element: <AppLayout />,
     children: navRoutes,
+  },
+  {
+    path: '/auth',
+    element: <AuthLayout />,
+    children: [
+      { path: 'login', element: <Login /> },
+      { path: 'signup', element: <Signup /> },
+    ],
   },
 ]);
