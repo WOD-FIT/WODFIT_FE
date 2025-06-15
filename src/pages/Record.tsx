@@ -1,4 +1,3 @@
-// src/pages/Record.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
@@ -22,11 +21,11 @@ export default function Record() {
   const handleSave = () => {
     const newRecord = {
       id: uuid(),
-      date: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+      date: new Date().toISOString().split('T')[0],
       text,
       time,
       exercises,
-      tags: ['Interval', 'Machine'], // TODO: 나중에 선택 UI로 변경
+      tags: ['Interval', 'Machine'], // TODO: 태그 선택 UI로 나중에 개선
     };
 
     const prev = JSON.parse(localStorage.getItem('wods') || '[]');
@@ -36,65 +35,74 @@ export default function Record() {
 
   return (
     <div className="min-h-screen bg-white px-4 py-6">
-      <div className="mb-4">
-        <label className="block font-semibold mb-1">WOD Text</label>
+      {/* WOD Text */}
+      <div className="mb-6">
+        <label className="block text-gray-600 text-base font-medium mb-2">WOD Text</label>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="수행한 WOD를 입력하세요."
-          className="w-full border rounded-xl px-4 py-3 text-sm text-gray-600"
+          className="w-full h-24 resize-none border border-gray-300 rounded-xl px-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6D4C1D]"
         />
       </div>
 
-      <div className="mb-4">
-        <label className="block font-semibold mb-1">My Record</label>
-        <div className="flex gap-2 items-center">
+      {/* My Record */}
+      <div className="mb-6">
+        <label className="block text-gray-600 text-base font-medium mb-2">My Record</label>
+        <div className="flex gap-3 items-end justify-center">
           <input
             value={time.min}
             onChange={(e) => setTime({ ...time, min: e.target.value })}
-            className="w-16 border rounded-xl text-center py-2"
             placeholder="-"
+            className="w-14 h-12 rounded-xl border border-gray-300 text-center text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6D4C1D]"
           />
-          <span>min</span>
+          <span className="text-sm">min</span>
           <input
             value={time.sec}
             onChange={(e) => setTime({ ...time, sec: e.target.value })}
-            className="w-16 border rounded-xl text-center py-2"
             placeholder="-"
+            className="w-14 h-12 rounded-xl border border-gray-300 text-center text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6D4C1D]"
           />
-          <span>second</span>
+          <span className="text-sm">second</span>
         </div>
       </div>
 
-      <div className="mb-6">
-        <label className="block font-semibold mb-2">Weight of Exercise</label>
+      {/* Weight of Exercise */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-base font-medium text-gray-700">Weight of Exercise</label>
+          <button onClick={addExercise} className="px-3 py-1 bg-black text-white text-sm rounded">
+            + Add
+          </button>
+        </div>
 
+        {/* Labels */}
+        <div className="flex text-sm text-gray-600 mb-2">
+          <div className="flex-1 text-left text-[#6D4C1D]">Exercise</div>
+          <div className="w-20 text-right text-[#6D4C1D]">Weight (lbs)</div>
+        </div>
+
+        {/* Input Rows */}
         {exercises.map((ex, idx) => (
-          <div key={idx} className="flex items-center gap-2 mb-2">
+          <div key={idx} className="flex items-center gap-2 mb-3">
             <input
               value={ex.name}
               onChange={(e) => handleExerciseChange(idx, 'name', e.target.value)}
               placeholder="Enter the name of exercise"
-              className="flex-1 border-b text-sm py-1 outline-none"
+              className="flex-1 h-8 border-b border-gray-300 text-sm py-1 text-black placeholder-gray-400 focus:outline-none focus:border-[#6D4C1D]"
             />
             <input
               value={ex.weight}
               onChange={(e) => handleExerciseChange(idx, 'weight', e.target.value)}
-              className="w-16 border-b text-sm text-center py-1 outline-none"
               placeholder="-"
+              className="w-16 h-8 border-b border-gray-300 text-sm text-center text-black placeholder-gray-400 focus:outline-none focus:border-[#6D4C1D]"
             />
-            <span className="text-sm text-gray-500">lbs</span>
+            <span className="text-sm text-gray-500 h-8 flex items-center">lbs</span>
           </div>
         ))}
-
-        <button
-          onClick={addExercise}
-          className="mt-2 px-3 py-1 bg-black text-white text-sm rounded"
-        >
-          + Add
-        </button>
       </div>
 
+      {/* Save Button */}
       <button
         onClick={handleSave}
         className="w-full bg-[#6D4C1D] text-white py-3 rounded-xl font-semibold"
