@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import WodCard from '../components/WODCard';
+import WodCard from '../components/WodCard';
 interface Wod {
   id: string;
   date: string;
