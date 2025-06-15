@@ -1,12 +1,6 @@
 // src/components/Footer.tsx
 import { useLocation, Link } from 'react-router-dom';
-
-const navItems = [
-  { label: '홈', path: '/', icon: 'home' },
-  { label: 'WOD 기록', path: '/wod', icon: 'record' },
-  { label: '수업 예약', path: '/reservation', icon: 'calendar' },
-  { label: 'MY', path: '/my', icon: 'my' },
-];
+import { navRoutes } from '../routes/Router';
 
 export default function Footer() {
   const location = useLocation();
@@ -14,7 +8,7 @@ export default function Footer() {
   return (
     <footer className="fixed bottom-0 w-full bg-gray-50 border-t border-gray-200 z-50">
       <div className="max-w-[375px] mx-auto flex justify-around items-center py-2">
-        {navItems.map(({ label, path, icon }) => {
+        {navRoutes.map(({ label, path, icon }) => {
           const isActive = location.pathname === path;
           const iconSrc = `/icons/${icon}${isActive ? '-active' : ''}.svg`;
 
