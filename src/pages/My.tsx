@@ -27,9 +27,9 @@ export default function My() {
           className="w-32 h-32 rounded-full object-cover"
         />
         <div className="flex flex-col ">
-          <div className="text-xl font-semibold text-black">김철홍</div>
+          <div className="text-xl font-semibold text-black">박상현</div>
           <div className="text-[#6D4C1D] text-sm mt-1">크로스핏 뉴젠</div>
-          <div className="text-sm text-gray-500 mt-1">keaikim77@gmail.com</div>
+          <div className="text-sm text-gray-500 mt-1">shawn2018@g.hongik.ac.kr</div>
         </div>
       </div>
 

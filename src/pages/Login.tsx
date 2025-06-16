@@ -1,21 +1,30 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import axios from 'axios';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+    try {
+      const res = await axios.post('http://localhost:3000/auth/login', {
+        email,
+        password: pw,
+      });
 
-    if (storedUser.email === email && storedUser.password === pw) {
+      // 로그인 성공 시 토큰 저장
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
       localStorage.setItem('isLoggedIn', 'true');
+
+      alert('로그인 성공');
       navigate('/');
-    } else {
-      alert('이메일 또는 비밀번호가 올바르지 않습니다.');
+    } catch (err: any) {
+      alert('로그인에 실패했습니다: ' + err.response?.data?.message || err.message);
     }
   };
 
@@ -36,10 +45,9 @@ export default function Login() {
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl"
           />
         </div>
-
         <div>
           <label htmlFor="password" className="block text-sm mb-1 text-gray-800">
             Password
@@ -50,10 +58,9 @@ export default function Login() {
             placeholder="Your password"
             value={pw}
             onChange={(e) => setPw(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none placeholder-gray-400"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl"
           />
         </div>
-
         <button
           type="submit"
           className="w-full bg-[#6D4C1D] text-white py-3 rounded-xl font-semibold mt-2"
