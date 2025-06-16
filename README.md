@@ -52,35 +52,33 @@ export default tseslint.config({
   },
 });
 ```
-
 📦src
-┣ 📂assets
-┃ ┗ 📜react.svg
-┣ 📂components
-┃ ┣ 📜Footer.tsx
-┃ ┣ 📜Header.tsx
-┃ ┗ 📜WodCard.tsx
-┣ 📂features
-┣ 📂hooks
-┣ 📂layouts
-┃ ┣ 📜AppLayout.tsx
-┃ ┗ 📜AuthLayout.tsx
-┣ 📂pages
-┃ ┣ 📜Home.tsx
-┃ ┣ 📜Login.tsx
-┃ ┣ 📜My.tsx
-┃ ┣ 📜Record.tsx
-┃ ┣ 📜Reservation.tsx
-┃ ┗ 📜Signup.tsx
-┣ 📂routes
-┃ ┗ 📜Router.tsx
-┣ 📂styles
-┣ 📂types
-┣ 📂utils
-┣ 📜App.css
-┣ 📜App.tsx
-┣ 📜index.css
-┣ 📜main.tsx
-┗ 📜vite-env.d.ts
-
-```
+ ┣ 📂assets
+ ┃ ┗ 📜react.svg
+ ┣ 📂components
+ ┃ ┣ 📜Footer.tsx
+ ┃ ┣ 📜Header.tsx
+ ┃ ┗ 📜WodCard.tsx
+ ┣ 📂features
+ ┣ 📂hooks
+ ┣ 📂layouts
+ ┃ ┣ 📜AppLayout.tsx
+ ┃ ┗ 📜AuthLayout.tsx
+ ┣ 📂pages
+ ┃ ┣ 📜Home.tsx
+ ┃ ┣ 📜Login.tsx
+ ┃ ┣ 📜My.tsx
+ ┃ ┣ 📜Record.tsx
+ ┃ ┣ 📜Reservation.tsx
+ ┃ ┗ 📜Signup.tsx
+ ┣ 📂routes
+ ┃ ┗ 📜Router.tsx
+ ┣ 📂styles
+ ┣ 📂types
+ ┣ 📂utils
+ ┣ 📜App.css
+ ┣ 📜App.tsx
+ ┣ 📜index.css
+ ┣ 📜main.tsx
+ ┗ 📜vite-env.d.ts
+ ```
