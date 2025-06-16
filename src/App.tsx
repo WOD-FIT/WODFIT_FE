@@ -1,13 +1,9 @@
-import Footer from './components/Footer';
+import { RouterProvider } from 'react-router-dom';
+
+import { router } from './routes/Router';
 
 function App() {
-  return (
-    <div>
-      <div>
-        <Footer />
-      </div>
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
