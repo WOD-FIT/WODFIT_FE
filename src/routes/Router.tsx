@@ -3,20 +3,19 @@ import { createBrowserRouter } from 'react-router';
 
 import { navRoutes } from '@/constants/routes';
 
-import AppLayout from '@/layouts/AppLayout';
-import AuthLayout from '@/layouts/AuthLayout';
+import Layout from '@/layouts/Layout';
 import Login from '@/pages/Login';
 import Signup from '@/pages/Signup';
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <AppLayout />,
+    element: <Layout />,
     children: navRoutes,
   },
   {
     path: '/auth',
-    element: <AuthLayout />,
+    element: <Layout />,
     children: [
       { path: 'login', element: <Login /> },
       { path: 'signup', element: <Signup /> },

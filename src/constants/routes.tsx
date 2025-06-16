@@ -1,7 +1,7 @@
-import Home from "@/pages/Home";
-import My from "@/pages/My";
-import Record from "@/pages/Record";
-import Reservation from "@/pages/Reservation";
+import Home from '@/pages/Home';
+import My from '@/pages/My';
+import Record from '@/pages/Record';
+import Reservation from '@/pages/Reservation';
 
 export const navRoutes = [
   { label: '홈', path: '/', icon: 'home', element: <Home /> },
