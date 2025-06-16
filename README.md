@@ -52,6 +52,7 @@ export default tseslint.config({
   },
 });
 ```
+```
 📦src
  ┣ 📂assets
  ┃ ┗ 📜react.svg
@@ -81,4 +82,5 @@ export default tseslint.config({
  ┣ 📜index.css
  ┣ 📜main.tsx
  ┗ 📜vite-env.d.ts
+ ```
  ```
