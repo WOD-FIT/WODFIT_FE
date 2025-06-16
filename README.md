@@ -53,64 +53,34 @@ export default tseslint.config({
 });
 ```
 
-```
-wodfit
-├─ .eslintrc.js
-├─ .prettierignore
-├─ .prettierrc
-├─ README.md
-├─ eslint.config.js
-├─ index.html
-├─ package.json
-├─ pnpm-lock.yaml
-├─ public
-│  └─ icons
-│     ├─ FIT.svg
-│     ├─ Logo-column.svg
-│     ├─ Logo.svg
-│     ├─ WOD.svg
-│     ├─ calendar-active.svg
-│     ├─ calendar.svg
-│     ├─ home-active.svg
-│     ├─ home.svg
-│     ├─ my-active.svg
-│     ├─ my.svg
-│     ├─ notice.svg
-│     ├─ profile.jpg
-│     ├─ record-active.svg
-│     ├─ record.svg
-│     └─ setting.svg
-├─ src
-│  ├─ App.css
-│  ├─ App.tsx
-│  ├─ assets
-│  │  └─ react.svg
-│  ├─ components
-│  │  ├─ Footer.tsx
-│  │  ├─ Header.tsx
-│  │  └─ WodCard.tsx
-│  ├─ features
-│  ├─ hooks
-│  ├─ index.css
-│  ├─ layouts
-│  │  ├─ AppLayout.tsx
-│  │  └─ AuthLayout.tsx
-│  ├─ main.tsx
-│  ├─ pages
-│  │  ├─ Home.tsx
-│  │  ├─ Login.tsx
-│  │  ├─ My.tsx
-│  │  ├─ Record.tsx
-│  │  ├─ Reservation.tsx
-│  │  └─ Signup.tsx
-│  ├─ routes
-│  │  └─ Router.tsx
-│  ├─ styles
-│  ├─ types
-│  ├─ utils
-│  └─ vite-env.d.ts
-├─ tsconfig.app.json
-├─ tsconfig.json
-├─ tsconfig.node.json
-└─ vite.config.ts
+📦src
+┣ 📂assets
+┃ ┗ 📜react.svg
+┣ 📂components
+┃ ┣ 📜Footer.tsx
+┃ ┣ 📜Header.tsx
+┃ ┗ 📜WodCard.tsx
+┣ 📂features
+┣ 📂hooks
+┣ 📂layouts
+┃ ┣ 📜AppLayout.tsx
+┃ ┗ 📜AuthLayout.tsx
+┣ 📂pages
+┃ ┣ 📜Home.tsx
+┃ ┣ 📜Login.tsx
+┃ ┣ 📜My.tsx
+┃ ┣ 📜Record.tsx
+┃ ┣ 📜Reservation.tsx
+┃ ┗ 📜Signup.tsx
+┣ 📂routes
+┃ ┗ 📜Router.tsx
+┣ 📂styles
+┣ 📂types
+┣ 📂utils
+┣ 📜App.css
+┣ 📜App.tsx
+┣ 📜index.css
+┣ 📜main.tsx
+┗ 📜vite-env.d.ts
+
 ```
