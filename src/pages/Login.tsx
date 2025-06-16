@@ -1,30 +1,28 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import { useState } from 'react';
-import axios from 'axios';
+
+import { login } from '@/api/auth';
 
 export default function Login() {
   const [email, setEmail] = useState('');
-  const [pw, setPw] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post('http://localhost:3000/auth/login', {
-        email,
-        password: pw,
-      });
+      const res = await login(email, password);
 
       // 로그인 성공 시 토큰 저장
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
+      localStorage.setItem('token', res.data.accessToken);
+      localStorage.setItem('user', res.data.user.nickname);
       localStorage.setItem('isLoggedIn', 'true');
 
-      alert('로그인 성공');
       navigate('/');
-    } catch (err: any) {
-      alert('로그인에 실패했습니다: ' + err.response?.data?.message || err.message);
+    } catch (error) {
+      console.error('로그인 실패', error);
+      alert('로그인 실패...');
     }
   };
 
@@ -56,8 +54,8 @@ export default function Login() {
             id="password"
             type="password"
             placeholder="Your password"
-            value={pw}
-            onChange={(e) => setPw(e.target.value)}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 rounded-xl"
           />
         </div>
