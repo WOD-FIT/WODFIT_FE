@@ -15,9 +15,7 @@ export default function Login() {
       const res = await login(email, password);
 
       // 로그인 성공 시 토큰 저장
-      localStorage.setItem('token', res.data.accessToken);
-      localStorage.setItem('user', res.data.user.nickname);
-      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('token', res.accessToken);
 
       navigate('/');
     } catch (error) {
