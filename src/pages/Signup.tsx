@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 export default function Signup() {
+  const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
   const navigate = useNavigate();
@@ -18,13 +19,26 @@ export default function Signup() {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen px-6 bg-white">
-      <div className="text-center mb-12">
+      <div className="text-center mb-9">
         <img src="/icons/Logo-column.svg" alt="WOD 로고" />
       </div>
 
       <form onSubmit={handleSignup} className="w-full max-w-sm space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm mb-1 text-gray-800">
+          <label htmlFor="nickname" className="block text-sm mb-1 text-black placeholder-gray-400">
+            Nickname
+          </label>
+          <input
+            id="nickname"
+            type="text"
+            placeholder="Enter your Nickname"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none"
+          />
+        </div>
+        <div>
+          <label htmlFor="email" className="block text-sm mb-1 text-black placeholder-gray-400">
             Email
           </label>
           <input
@@ -33,21 +47,21 @@ export default function Signup() {
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 border border-black rounded-xl focus:outline-none"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none"
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm mb-1 text-gray-800">
+          <label htmlFor="password" className="block text-sm mb-1 text-black  placeholder-gray-400">
             Password
           </label>
           <input
             id="password"
             type="password"
-            placeholder="Your password"
+            placeholder="Enter your password"
             value={pw}
             onChange={(e) => setPw(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none placeholder-gray-400"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none"
           />
         </div>
 
