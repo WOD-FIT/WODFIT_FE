@@ -11,4 +11,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'), // ✅ alias 설정
     },
   },
+  server: {
+    port: 3000,
+  },
 });
