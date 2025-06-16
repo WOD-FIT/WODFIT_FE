@@ -1,6 +1,7 @@
 // src/components/Footer.tsx
 import { useLocation, Link } from 'react-router-dom';
-import { navRoutes } from '../routes/Router';
+import { navRoutes } from '@/constants/routes';
+
 
 export default function Footer() {
   const location = useLocation();
