@@ -28,15 +28,15 @@ export default tseslint.config({
       tsconfigRootDir: import.meta.dirname,
     },
   },
-})
+});
 ```
 
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
 ```js
 // eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+import reactX from 'eslint-plugin-react-x';
+import reactDom from 'eslint-plugin-react-dom';
 
 export default tseslint.config({
   plugins: {
@@ -50,7 +50,7 @@ export default tseslint.config({
     ...reactX.configs['recommended-typescript'].rules,
     ...reactDom.configs.recommended.rules,
   },
-})
+});
 ```
 
 ```
@@ -113,67 +113,4 @@ wodfit
 ├─ tsconfig.json
 ├─ tsconfig.node.json
 └─ vite.config.ts
-
-```
-```
-wodfit
-├─ .eslintrc.js
-├─ .prettierignore
-├─ .prettierrc
-├─ README.md
-├─ eslint.config.js
-├─ index.html
-├─ package.json
-├─ pnpm-lock.yaml
-├─ public
-│  └─ icons
-│     ├─ FIT.svg
-│     ├─ Logo-column.svg
-│     ├─ Logo.svg
-│     ├─ WOD.svg
-│     ├─ calendar-active.svg
-│     ├─ calendar.svg
-│     ├─ home-active.svg
-│     ├─ home.svg
-│     ├─ my-active.svg
-│     ├─ my.svg
-│     ├─ notice.svg
-│     ├─ profile.jpg
-│     ├─ record-active.svg
-│     ├─ record.svg
-│     └─ setting.svg
-├─ src
-│  ├─ App.css
-│  ├─ App.tsx
-│  ├─ assets
-│  │  └─ react.svg
-│  ├─ components
-│  │  ├─ Footer.tsx
-│  │  ├─ Header.tsx
-│  │  └─ WodCard.tsx
-│  ├─ features
-│  ├─ hooks
-│  ├─ index.css
-│  ├─ layouts
-│  │  ├─ AppLayout.tsx
-│  │  └─ AuthLayout.tsx
-│  ├─ main.tsx
-│  ├─ pages
-│  │  ├─ Home.tsx
-│  │  ├─ Login.tsx
-│  │  ├─ My.tsx
-│  │  ├─ Record.tsx
-│  │  ├─ Reservation.tsx
-│  │  └─ Signup.tsx
-│  ├─ routes
-│  │  └─ Router.tsx
-│  ├─ styles
-│  ├─ types
-│  ├─ utils
-│  └─ vite-env.d.ts
-├─ tsconfig.app.json
-├─ tsconfig.json
-├─ tsconfig.node.json
-└─ vite.config.ts
-
 ```
