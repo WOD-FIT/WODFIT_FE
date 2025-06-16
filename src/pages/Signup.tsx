@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import { useState } from 'react';
 import axios from 'axios'; // axios를 사용하여 HTTP 요청을 보냅니다.
 

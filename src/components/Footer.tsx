@@ -1,5 +1,5 @@
 // src/components/Footer.tsx
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router';
 import { navRoutes } from '@/constants/routes';
 
 
