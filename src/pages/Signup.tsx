@@ -1,23 +1,27 @@
 import { Link, useNavigate } from 'react-router';
 import { useState } from 'react';
-import axios from 'axios'; // axios를 사용하여 HTTP 요청을 보냅니다.
+
+import { signup } from '@/api/auth';
 
 export default function Signup() {
+  const navigate = useNavigate();
+
   const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post('/auth/signup', { email, password, nickname });
-      navigate('/auth/login');
-    } catch (err: any) {
-      console.log(err.response); // 콘솔 확인용
-      const msg = err.response?.data?.message || '알 수 없는 오류';
-      alert('회원가입에 실패했습니다: ' + msg);
+      const response = await signup(email, password, nickname);
+      console.log(response);
+
+      navigate('/');
+    } catch {
+      console.error('회원가입 실패'); // 콘솔 확인용
+      // const msg = error.response?.data?.message || '알 수 없는 오류';
+      // alert('회원가입에 실패했습니다: ' + msg);
     }
   };
 
@@ -49,6 +53,7 @@ export default function Signup() {
             id="email"
             type="email"
             placeholder="Enter your email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 rounded-xl"
@@ -62,6 +67,7 @@ export default function Signup() {
             id="password"
             type="password"
             placeholder="Enter your password"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 rounded-xl"
