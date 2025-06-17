@@ -1,3 +1,4 @@
+import { wodSort } from '@/api/wodSort';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { v4 as uuid } from 'uuid';
@@ -6,6 +7,7 @@ export default function Record() {
   const [text, setText] = useState('');
   const [time, setTime] = useState({ min: '', sec: '' });
   const [exercises, setExercises] = useState([{ name: '', weight: '' }]);
+
   const navigate = useNavigate();
 
   const handleExerciseChange = (index: number, field: 'name' | 'weight', value: string) => {
@@ -18,19 +20,40 @@ export default function Record() {
     setExercises([...exercises, { name: '', weight: '' }]);
   };
 
-  const handleSave = () => {
-    const newRecord = {
-      id: uuid(),
-      date: new Date().toISOString().split('T')[0],
-      text,
-      time,
-      exercises,
-      tags: ['Interval', 'Machine'], // TODO: 태그 선택 UI로 나중에 개선
-    };
+  const handleSave = async () => {
+    try {
+      const averageWeight = Number(
+        (
+          exercises.reduce((acc, cur) => acc + Number(cur.weight || 0), 0) / (exercises.length || 1)
+        ).toFixed(1),
+      );
 
-    const prev = JSON.parse(localStorage.getItem('wods') || '[]');
-    localStorage.setItem('wods', JSON.stringify([newRecord, ...prev]));
-    navigate('/my');
+      const requestBody = {
+        wods: [text],
+        weights: [averageWeight],
+      };
+
+      console.log(requestBody);
+
+      const response = await wodSort(requestBody);
+      console.log(response);
+
+      const newRecord = {
+        id: uuid(),
+        date: new Date().toISOString().split('T')[0],
+        text,
+        time,
+        exercises,
+        tags: response.labels, // TODO: 태그 선택 UI로 나중에 개선
+      };
+
+      const prev = JSON.parse(localStorage.getItem('wods') || '[]');
+      localStorage.setItem('wods', JSON.stringify([newRecord, ...prev]));
+
+      navigate('/my');
+    } catch (error) {
+      console.error('WOD 분류 실패', error);
+    }
   };
 
   return (

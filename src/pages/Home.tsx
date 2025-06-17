@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router';
 
 export default function Home() {
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const isLoggedIn = !!localStorage.getItem('token');
 
   if (!isLoggedIn) {
     return <Navigate to="/auth/login" />;
