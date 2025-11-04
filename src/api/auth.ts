@@ -22,16 +22,17 @@ export const signup = async (
     users.push({ email, password, nickname, role });
     localStorage.setItem('users', JSON.stringify(users));
 
-    // 회원가입 시 기본 프로필 정보 생성
+    // 회원가입 시 기본 프로필 정보 생성 (사용자별로 분리)
     const defaultProfile = {
       name: nickname,
-      heightCm: 0,
-      weightKg: 0,
-      muscleKg: 0,
-      age: 0,
+      heightCm: '',
+      weightKg: '',
+      muscleKg: '',
+      age: '',
       boxName: '',
     };
-    localStorage.setItem('member_profile', JSON.stringify(defaultProfile));
+    const profileKey = `member_profile_${email}`;
+    localStorage.setItem(profileKey, JSON.stringify(defaultProfile));
 
     return { ok: true, mock: true } as any;
   }

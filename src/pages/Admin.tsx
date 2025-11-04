@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router';
+import { getToday } from '@/utils/date';
 
 type WodPayload = {
   date: string; // YYYY-MM-DD
@@ -9,12 +11,24 @@ type WodPayload = {
 type SavedWod = WodPayload & { id: string };
 
 export default function Admin() {
-  const today = new Date().toISOString().slice(0, 10);
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<'register' | 'list'>('register');
+  const today = getToday();
   const [form, setForm] = useState<WodPayload>({ date: today, title: '', description: '' });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [savedList, setSavedList] = useState<SavedWod[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  // URL 파라미터에서 날짜 가져오기 (AdminHome에서 전달된 날짜)
+  useEffect(() => {
+    const dateParam = searchParams.get('date');
+    if (dateParam) {
+      setForm((prev) => ({ ...prev, date: dateParam }));
+      // register 탭으로 자동 전환
+      setActiveTab('register');
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const raw = localStorage.getItem('wod_admin_saved');
@@ -64,7 +78,7 @@ export default function Admin() {
 
         // 수업 등록 확인 팝업
         setTimeout(() => {
-          const shouldRegisterClass = confirm('등록한 WOD로 수업등록하시겠습니까?');
+          const shouldRegisterClass = confirm('등록한 WOD로 수업을 개설하시겠습니까?');
 
           if (shouldRegisterClass) {
             // 수업 등록 페이지로 이동하고, 방금 등록한 WOD를 미리 선택
@@ -85,91 +99,127 @@ export default function Admin() {
     }
   };
 
+  const handleDeleteWod = (wodId: string) => {
+    if (!confirm('이 WOD를 삭제하시겠습니까?')) return;
+    const next = savedList.filter((it) => it.id !== wodId);
+    persistList(next);
+  };
+
   return (
     <div className="px-4 py-4 w-full">
-      <h2 className="text-xl font-bold">WOD 등록</h2>
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
-        <label className="text-sm">
-          <div className="mb-1 text-gray-700">날짜</div>
-          <input
-            type="date"
-            name="date"
-            value={form.date}
-            onChange={onChange}
-            className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#63461E]"
-          />
-        </label>
-        <label className="text-sm">
-          <div className="mb-1 text-gray-700">제목</div>
-          <input
-            name="title"
-            placeholder="예: For Time - 5RFT"
-            value={form.title}
-            onChange={onChange}
-            className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#63461E]"
-          />
-        </label>
-        <label className="text-sm">
-          <div className="mb-1 text-gray-700">내용</div>
-          <textarea
-            name="description"
-            placeholder={`예:\n- 400m Run\n- 21 Air Squats\n- 15 Push-ups\n- 9 Pull-ups`}
-            rows={8}
-            value={form.description}
-            onChange={onChange}
-            className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#63461E]"
-          />
-        </label>
+      <h2 className="text-xl font-bold">WOD 관리</h2>
+
+      {/* 탭바 */}
+      <div className="mt-4 flex border-b border-gray-200">
         <button
-          type="submit"
-          disabled={loading}
-          className="mt-2 h-11 rounded-lg bg-[#63461E] text-white font-medium disabled:opacity-60"
+          onClick={() => setActiveTab('register')}
+          className={`flex-1 py-3 text-center font-medium transition-colors ${
+            activeTab === 'register'
+              ? 'border-b-2 border-[#63461E] text-[#63461E]'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
         >
-          {loading ? '등록 중...' : '등록하기'}
+          WOD 등록
         </button>
-      </form>
-      {message && <p className="mt-3 text-sm text-green-700">{message}</p>}
-      <div className="mt-6">
-        <h3 className="font-semibold mb-2">저장된 WOD</h3>
-        {savedList.length === 0 ? (
-          <p className="text-sm text-gray-600">아직 저장된 항목이 없습니다.</p>
-        ) : (
-          <ul className="grid gap-2">
-            {savedList.map((item) => (
-              <li key={item.id} className="border border-gray-200 rounded-lg p-3">
-                <div className="text-xs text-gray-500">{item.date}</div>
-                <div className="font-semibold">{item.title}</div>
-                <pre className="whitespace-pre-wrap m-0 text-sm">{item.description}</pre>
-                <div className="mt-2 flex gap-2">
-                  <button
-                    className="px-3 h-9 rounded-lg bg-[#63461E] text-white"
-                    onClick={() => {
-                      setEditingId(item.id);
-                      setForm({
-                        date: item.date,
-                        title: item.title,
-                        description: item.description,
-                      });
-                    }}
-                  >
-                    수정
-                  </button>
-                  <button
-                    className="px-3 h-9 rounded-lg border border-red-300 text-red-600"
-                    onClick={() => {
-                      if (!confirm('삭제하시겠습니까?')) return;
-                      const next = savedList.filter((it) => it.id !== item.id);
-                      persistList(next);
-                    }}
-                  >
-                    삭제
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        <button
+          onClick={() => setActiveTab('list')}
+          className={`flex-1 py-3 text-center font-medium transition-colors ${
+            activeTab === 'list'
+              ? 'border-b-2 border-[#63461E] text-[#63461E]'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          등록된 WOD
+        </button>
       </div>
+
+      {/* WOD 등록 탭 */}
+      {activeTab === 'register' && (
+        <form onSubmit={onSubmit} className="mt-4 flex flex-col gap-3">
+          <label className="text-sm">
+            <div className="mb-1 text-gray-700">날짜</div>
+            <input
+              type="date"
+              name="date"
+              value={form.date}
+              onChange={onChange}
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#63461E]"
+            />
+          </label>
+          <label className="text-sm">
+            <div className="mb-1 text-gray-700">제목</div>
+            <input
+              name="title"
+              placeholder="예: For Time - 5RFT"
+              value={form.title}
+              onChange={onChange}
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#63461E]"
+            />
+          </label>
+          <label className="text-sm">
+            <div className="mb-1 text-gray-700">내용</div>
+            <textarea
+              name="description"
+              placeholder={`예:\n- 400m Run\n- 21 Air Squats\n- 15 Push-ups\n- 9 Pull-ups`}
+              rows={8}
+              value={form.description}
+              onChange={onChange}
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#63461E]"
+            />
+          </label>
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-2 h-11 rounded-lg bg-[#63461E] text-white font-medium disabled:opacity-60"
+          >
+            {loading ? '등록 중...' : '등록하기'}
+          </button>
+        </form>
+      )}
+      {message && activeTab === 'register' && (
+        <p className="mt-3 text-sm text-green-700">{message}</p>
+      )}
+
+      {/* 등록된 WOD 탭 */}
+      {activeTab === 'list' && (
+        <div className="mt-4">
+          {savedList.length === 0 ? (
+            <p className="text-sm text-gray-600">아직 저장된 항목이 없습니다.</p>
+          ) : (
+            <ul className="grid gap-2">
+              {savedList.map((item) => (
+                <li key={item.id} className="border border-gray-200 rounded-lg p-3">
+                  <div className="text-xs text-gray-500">{item.date}</div>
+                  <div className="font-semibold">{item.title}</div>
+                  <pre className="whitespace-pre-wrap m-0 text-sm">{item.description}</pre>
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      className="px-3 h-9 rounded-lg bg-[#63461E] text-white"
+                      onClick={() => {
+                        setEditingId(item.id);
+                        setForm({
+                          date: item.date,
+                          title: item.title,
+                          description: item.description,
+                        });
+                        setActiveTab('register');
+                      }}
+                    >
+                      수정
+                    </button>
+                    <button
+                      className="px-3 h-9 rounded-lg border border-red-300 text-red-600"
+                      onClick={() => handleDeleteWod(item.id)}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   );
 }

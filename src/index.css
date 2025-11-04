@@ -38,3 +38,199 @@ body {
     box-shadow: none;
   }
 }
+
+/* 다크모드 스타일 */
+.dark {
+  color-scheme: dark;
+}
+
+.dark #root {
+  background-color: #1a1a1a;
+}
+
+.dark .app-container {
+  background-color: #1f1f1f;
+  color: #e5e5e5;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.dark .bg-white {
+  background-color: #2d2d2d;
+}
+
+.dark .text-gray-900 {
+  color: #ffffff;
+}
+
+.dark .text-gray-800 {
+  color: #ffffff;
+}
+
+.dark .text-gray-700 {
+  color: #e5e5e5;
+}
+
+.dark .text-gray-600 {
+  color: #d4d4d4;
+}
+
+.dark .text-gray-500 {
+  color: #b3b3b3;
+}
+
+.dark .text-gray-400 {
+  color: #9a9a9a;
+}
+
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-gray-300 {
+  border-color: #555555;
+}
+
+.dark .border-gray-400 {
+  border-color: #666666;
+}
+
+/* 다크모드에서 기본 텍스트 색상 */
+.dark {
+  color: #ffffff;
+}
+
+/* 다크모드에서 기본 텍스트 요소들 */
+.dark p:not([class*="text-"]),
+.dark span:not([class*="text-"]),
+.dark div:not([class*="text-"]),
+.dark h1:not([class*="text-"]),
+.dark h2:not([class*="text-"]),
+.dark h3:not([class*="text-"]),
+.dark h4:not([class*="text-"]),
+.dark h5:not([class*="text-"]),
+.dark h6:not([class*="text-"]) {
+  color: #ffffff;
+}
+
+/* 다크모드에서 링크 텍스트 */
+.dark a:not([class*="text-"]) {
+  color: #ffffff;
+}
+
+/* 다크모드에서 label 텍스트 */
+.dark label:not([class*="text-"]) {
+  color: #ffffff;
+}
+
+.dark .bg-gray-50,
+.dark .bg-gray-100 {
+  background-color: #3a3a3a;
+}
+
+.dark .bg-gray-200 {
+  background-color: #4a4a4a;
+}
+
+/* 다크모드에서 그림자 효과 개선 */
+.dark .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.dark .shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.dark .shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+}
+
+/* 다크모드에서 입력 필드 개선 */
+.dark input[type='text'],
+.dark input[type='password'],
+.dark input[type='email'],
+.dark input[type='number'],
+.dark input[type='date'],
+.dark input[type='time'],
+.dark textarea,
+.dark select {
+  background-color: #3a3a3a;
+  color: #e5e5e5;
+  border-color: #404040;
+}
+
+.dark input[type='text']:focus,
+.dark input[type='password']:focus,
+.dark input[type='email']:focus,
+.dark input[type='number']:focus,
+.dark input[type='date']:focus,
+.dark input[type='time']:focus,
+.dark textarea:focus,
+.dark select:focus {
+  background-color: #3a3a3a;
+  border-color: #8B5A2B;
+  outline: none;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #666666;
+}
+
+/* 다크모드에서 버튼 개선 */
+.dark button {
+  transition: all 0.2s ease;
+}
+
+/* 다크모드에서 링크 개선 */
+.dark a {
+  transition: color 0.2s ease;
+}
+
+/* 다크모드에서 카드/컨테이너 개선 */
+.dark .rounded-2xl,
+.dark .rounded-lg,
+.dark .rounded {
+  border-color: #404040;
+}
+
+/* Footer 다크모드 */
+.dark footer {
+  background-color: #2d2d2d;
+  border-color: #555555;
+}
+
+/* Header 다크모드 */
+.dark header {
+  background-color: #2d2d2d;
+  border-color: #555555;
+}
+
+/* 다크모드에서 Footer 아이콘은 원래 색상 유지 (테두리만 스타일 적용) */
+.dark footer img[src*="icon"] {
+  filter: none;
+}
+
+/* 다크모드에서 Header 아이콘은 흰색으로 */
+.dark header img[src*="icon"]:not([src*="Logo"]) {
+  filter: brightness(0) invert(1) opacity(1);
+}
+
+/* 로고는 다크모드에서 밝게 */
+.dark img[src*="Logo"] {
+  filter: brightness(0) invert(1) opacity(1);
+}
+
+/* 모든 SVG 아이콘도 흰색으로 */
+.dark svg {
+  color: #ffffff;
+}
+
+.dark svg path,
+.dark svg circle,
+.dark svg rect,
+.dark svg polygon {
+  fill: currentColor;
+  stroke: currentColor;
+}

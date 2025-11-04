@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ClassCard } from '@/components/cards/ClassCard';
 import { PageContainer } from '@/components/layout/PageContainer';
@@ -17,15 +18,30 @@ type SavedClass = {
 type ReservedWod = { wodId: string; date: string; userId?: string; userNickname?: string };
 
 export default function AdminClass() {
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState<'register' | 'list'>(
+    tabParam === 'list' ? 'list' : 'register',
+  );
   const [savedWods] = useLocalStorage<any[]>('wod_admin_saved', []);
   const [classes, setClasses] = useLocalStorage<SavedClass[]>('admin_classes', []);
   const [reservations] = useLocalStorage<ReservedWod[]>('reserved_wods', []);
   const [formData, setFormData] = useState({
+    date: getToday(),
     time: '',
     location: '',
     wodId: '',
     capacity: '',
   });
+
+  // URL 파라미터가 변경되면 탭도 업데이트
+  useEffect(() => {
+    if (tabParam === 'list') {
+      setActiveTab('list');
+    } else if (tabParam === 'register') {
+      setActiveTab('register');
+    }
+  }, [tabParam]);
 
   const wodOptions = useMemo(() => {
     return savedWods.map((wod) => ({
@@ -87,7 +103,7 @@ export default function AdminClass() {
 
     const newClass: SavedClass = {
       id: crypto.randomUUID(),
-      date: getToday(),
+      date: formData.date,
       time: formData.time,
       location: formData.location,
       wodId: formData.wodId,
@@ -102,23 +118,13 @@ export default function AdminClass() {
       return updated;
     });
 
-    setFormData({ time: '', location: '', wodId: '', capacity: '' });
+    setFormData({ date: getToday(), time: '', location: '', wodId: '', capacity: '' });
     alert('수업이 등록되었습니다.');
   };
 
   const handleViewReservations = (classItem: SavedClass) => {
-    const wod = savedWods.find((w) => w.id === classItem.wodId);
-    const classReservations = reservations.filter(
-      (r) => r.wodId === classItem.wodId && r.date === classItem.date,
-    );
-
-    const reservationList = classReservations
-      .map((r) => `- ${r.userNickname || '닉네임 없음'} (${r.userId || '이메일 없음'})`)
-      .join('\n');
-
-    alert(
-      `수업 정보:\n날짜: ${classItem.date}\n시간: ${classItem.time}\n장소: ${classItem.location}\nWOD: ${wod?.title || 'N/A'}\n정원: ${classItem.capacity}\n예약자 수: ${classReservations.length}명\n\n예약자 목록:\n${reservationList || '예약자가 없습니다.'}`,
-    );
+    // 홈 화면과 동일한 상세 페이지로 이동
+    window.location.href = `/admin/class/${classItem.id}`;
   };
 
   const handleDeleteClass = (classId: string) => {
@@ -128,94 +134,134 @@ export default function AdminClass() {
 
   return (
     <PageContainer>
-      <PageHeader title="수업 등록" />
+      <PageHeader title="수업 관리" />
 
-      <form onSubmit={handleSubmit} className="mt-4 grid gap-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">시간</label>
-          <input
-            type="text"
-            value={formData.time}
-            onChange={(e) => {
-              const timeValue = e.target.value;
-              console.log('Time input value:', timeValue); // 디버깅용 로그
-              setFormData((prev) => ({ ...prev, time: timeValue }));
-            }}
-            className="w-full border rounded-lg px-3 py-2"
-            placeholder="19:30"
-            required
-          />
-          <p className="text-xs text-gray-500 mt-1">24시간 형식으로 입력하세요 (예: 19:30)</p>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">장소</label>
-          <input
-            type="text"
-            value={formData.location}
-            onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
-            className="w-full border rounded-lg px-3 py-2"
-            placeholder="수업 장소를 입력하세요"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">WOD 선택</label>
-          <select
-            value={formData.wodId}
-            onChange={(e) => setFormData((prev) => ({ ...prev, wodId: e.target.value }))}
-            className="w-full border rounded-lg px-3 py-2"
-            required
-          >
-            <option value="">WOD를 선택하세요</option>
-            {wodOptions.map((wod) => (
-              <option key={wod.id} value={wod.id}>
-                {wod.title}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">정원</label>
-          <input
-            type="number"
-            value={formData.capacity}
-            onChange={(e) => setFormData((prev) => ({ ...prev, capacity: e.target.value }))}
-            className="w-full border rounded-lg px-3 py-2"
-            min="1"
-            required
-          />
-        </div>
-
-        <button type="submit" className="h-11 rounded-lg bg-[#63461E] text-white">
+      {/* 탭바 */}
+      <div className="mt-4 flex border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab('register')}
+          className={`flex-1 py-3 text-center font-medium transition-colors ${
+            activeTab === 'register'
+              ? 'border-b-2 border-[#63461E] text-[#63461E]'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
           수업 등록
         </button>
-      </form>
-
-      <div className="mt-6">
-        <h3 className="font-semibold mb-3">등록된 수업 목록</h3>
-        {classes.length === 0 ? (
-          <p className="text-sm text-gray-500">등록된 수업이 없습니다.</p>
-        ) : (
-          <div className="grid gap-3">
-            {classes.map((classItem) => (
-              <ClassCard
-                key={classItem.id}
-                date={classItem.date}
-                time={classItem.time}
-                location={classItem.location}
-                wodTitle={getWodTitle(classItem.wodId)}
-                capacity={classItem.capacity}
-                reservationCount={getReservationCount(classItem.wodId, classItem.date)}
-                onViewReservations={() => handleViewReservations(classItem)}
-                onDelete={() => handleDeleteClass(classItem.id)}
-              />
-            ))}
-          </div>
-        )}
+        <button
+          onClick={() => setActiveTab('list')}
+          className={`flex-1 py-3 text-center font-medium transition-colors ${
+            activeTab === 'list'
+              ? 'border-b-2 border-[#63461E] text-[#63461E]'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          수업 목록
+        </button>
       </div>
+
+      {/* 수업 등록 탭 */}
+      {activeTab === 'register' && (
+        <form onSubmit={handleSubmit} className="mt-4 grid gap-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">날짜</label>
+            <input
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
+              className="w-full border rounded-lg px-3 py-2"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">시간</label>
+            <input
+              type="text"
+              value={formData.time}
+              onChange={(e) => {
+                const timeValue = e.target.value;
+                console.log('Time input value:', timeValue); // 디버깅용 로그
+                setFormData((prev) => ({ ...prev, time: timeValue }));
+              }}
+              className="w-full border rounded-lg px-3 py-2"
+              placeholder="19:30"
+              required
+            />
+            <p className="text-xs text-gray-500 mt-1">24시간 형식으로 입력하세요 (예: 19:30)</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">장소</label>
+            <input
+              type="text"
+              value={formData.location}
+              onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
+              className="w-full border rounded-lg px-3 py-2"
+              placeholder="수업 장소를 입력하세요"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">WOD 선택</label>
+            <select
+              value={formData.wodId}
+              onChange={(e) => setFormData((prev) => ({ ...prev, wodId: e.target.value }))}
+              className="w-full border rounded-lg px-3 py-2"
+              required
+            >
+              <option value="">WOD를 선택하세요</option>
+              {wodOptions.map((wod) => (
+                <option key={wod.id} value={wod.id}>
+                  {wod.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">정원</label>
+            <input
+              type="number"
+              value={formData.capacity}
+              onChange={(e) => setFormData((prev) => ({ ...prev, capacity: e.target.value }))}
+              className="w-full border rounded-lg px-3 py-2"
+              min="1"
+              required
+            />
+          </div>
+
+          <button type="submit" className="h-11 rounded-lg bg-[#63461E] text-white">
+            수업 등록
+          </button>
+        </form>
+      )}
+
+      {/* 수업 목록 탭 */}
+      {activeTab === 'list' && (
+        <div className="mt-4">
+          {classes.length === 0 ? (
+            <p className="text-sm text-gray-500">등록된 수업이 없습니다.</p>
+          ) : (
+            <div className="grid gap-3">
+              {classes.map((classItem) => (
+                <ClassCard
+                  key={classItem.id}
+                  date={classItem.date}
+                  time={classItem.time}
+                  location={classItem.location}
+                  wodTitle={getWodTitle(classItem.wodId)}
+                  capacity={classItem.capacity}
+                  reservationCount={getReservationCount(classItem.wodId, classItem.date)}
+                  onViewReservations={() => handleViewReservations(classItem)}
+                  onDelete={() => handleDeleteClass(classItem.id)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </PageContainer>
   );
 }

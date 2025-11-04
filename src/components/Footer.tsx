@@ -16,8 +16,8 @@ export default function Footer() {
     if (user?.role === 'coach') {
       return [
         { label: '홈', path: '/admin/home', icon: 'home' },
-        { label: 'WOD 등록', path: '/admin', icon: 'record' },
-        { label: '수업 등록', path: '/admin/class', icon: 'calendar' },
+        { label: 'WOD 관리', path: '/admin', icon: 'record' },
+        { label: '수업 관리', path: '/admin/class', icon: 'calendar' },
         { label: 'My', path: '/admin/my', icon: 'my' },
       ];
     }
@@ -30,7 +30,7 @@ export default function Footer() {
   }, [user?.role]);
 
   return (
-    <footer className="absolute bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 z-50">
+    <footer className="absolute bottom-0 left-0 right-0 w-full bg-white dark:bg-[#2d2d2d] border-t border-gray-200 dark:border-[#555555] z-50 transition-colors">
       <div className="w-full flex justify-around items-center py-3 px-2">
         {dynamicRoutes.map(({ label, path, icon }) => {
           const isActive = location.pathname === path;
@@ -40,16 +40,20 @@ export default function Footer() {
             <Link
               key={path}
               to={path}
-              className="flex flex-col items-center justify-center flex-1 text-xs transition-colors"
+              className="flex flex-col items-center justify-center flex-1 text-xs transition-all hover:opacity-80"
             >
               <img
                 src={iconSrc}
                 alt={`${label} 아이콘`}
-                className={`w-6 h-6 mb-1 ${isActive ? 'opacity-100' : 'opacity-60'}`}
+                className={`w-6 h-6 mb-1 transition-all ${
+                  isActive ? 'opacity-100 dark:opacity-100' : 'opacity-60 dark:opacity-70'
+                }`}
               />
               <span
-                className={`text-[10px] ${
-                  isActive ? 'font-semibold text-[#63461E]' : 'text-gray-500'
+                className={`text-[10px] transition-colors ${
+                  isActive
+                    ? 'font-semibold text-[#63461E] dark:text-[#D4A574]'
+                    : 'text-gray-500 dark:text-white'
                 }`}
               >
                 {label}

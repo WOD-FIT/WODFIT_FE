@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router';
+import { useParams, useNavigate, useSearchParams } from 'react-router';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -56,7 +56,7 @@ export default function AdminClassDetail() {
           title="수업 정보 없음"
           actions={
             <button
-              onClick={() => navigate('/admin/home')}
+              onClick={() => navigate('/admin/class?tab=list')}
               className="text-sm px-3 py-1 bg-gray-500 text-white rounded"
             >
               목록으로
@@ -74,7 +74,7 @@ export default function AdminClassDetail() {
         title="수업 상세 정보"
         actions={
           <button
-            onClick={() => navigate('/admin/home')}
+            onClick={() => navigate('/admin/class?tab=list')}
             className="text-sm px-3 py-1 bg-gray-500 text-white rounded"
           >
             목록으로

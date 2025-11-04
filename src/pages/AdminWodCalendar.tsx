@@ -6,8 +6,14 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { formatDisplayDate } from '@/utils/date';
 
 export default function AdminWodCalendar() {
-  const [savedWods] = useLocalStorage<any[]>('wod_admin_saved', []);
+  const [savedWods, setSavedWods] = useLocalStorage<any[]>('wod_admin_saved', []);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  const handleDeleteWod = (wodId: string) => {
+    if (!confirm('이 WOD를 삭제하시겠습니까?')) return;
+    const next = savedWods.filter((w) => w.id !== wodId);
+    setSavedWods(next);
+  };
 
   const markedDates = useMemo(() => {
     return savedWods.map((wod) => wod.date);
@@ -51,7 +57,15 @@ export default function AdminWodCalendar() {
                           {wod.description}
                         </div>
                       </div>
-                      <div className="text-xs px-2 py-1 bg-[#63461E] text-white rounded">WOD</div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-xs px-2 py-1 bg-[#63461E] text-white rounded">WOD</div>
+                        <button
+                          onClick={() => handleDeleteWod(wod.id)}
+                          className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+                        >
+                          삭제
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

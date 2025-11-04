@@ -44,24 +44,24 @@ export default function AdminMy() {
 
       <div className="grid grid-cols-2 gap-3 mb-6">
         <Link to="/admin/wod-calendar" className="block">
-          <div className="bg-[#63461E] text-white rounded-lg p-3 text-center hover:bg-[#5a3d1a] transition-colors cursor-pointer">
+          <div className="bg-[#63461E] dark:bg-[#8B5A2B] text-white rounded-lg p-3 text-center hover:bg-[#5a3d1a] dark:hover:bg-[#A67C52] transition-colors cursor-pointer">
             <div className="text-lg font-bold">{memberStats[1].value}</div>
             <div className="text-xs">{memberStats[1].title}</div>
           </div>
         </Link>
         <Link to="/admin/class-calendar" className="block">
-          <div className="bg-[#63461E] text-white rounded-lg p-3 text-center hover:bg-[#5a3d1a] transition-colors cursor-pointer">
+          <div className="bg-[#63461E] dark:bg-[#8B5A2B] text-white rounded-lg p-3 text-center hover:bg-[#5a3d1a] dark:hover:bg-[#A67C52] transition-colors cursor-pointer">
             <div className="text-lg font-bold">{memberStats[2].value}</div>
             <div className="text-xs">{memberStats[2].title}</div>
           </div>
         </Link>
         <Link to="/admin/members" className="block">
-          <div className="bg-[#63461E] text-white rounded-lg p-3 text-center hover:bg-[#5a3d1a] transition-colors cursor-pointer">
+          <div className="bg-[#63461E] dark:bg-[#8B5A2B] text-white rounded-lg p-3 text-center hover:bg-[#5a3d1a] dark:hover:bg-[#A67C52] transition-colors cursor-pointer">
             <div className="text-lg font-bold">{memberStats[0].value}</div>
             <div className="text-xs">{memberStats[0].title}</div>
           </div>
         </Link>
-        <div className="bg-[#63461E] text-white rounded-lg p-3 text-center">
+        <div className="bg-[#63461E] dark:bg-[#8B5A2B] text-white rounded-lg p-3 text-center">
           <div className="text-lg font-bold">{memberStats[3].value}</div>
           <div className="text-xs">{memberStats[3].title}</div>
         </div>
@@ -69,13 +69,16 @@ export default function AdminMy() {
 
       {/* 최근 가입 회원 */}
       <div className="mb-6">
-        <h3 className="font-semibold mb-3">최근 가입 회원</h3>
+        <h3 className="font-semibold mb-3 text-gray-900 dark:text-white">최근 가입 회원</h3>
         {recentMembers.length === 0 ? (
-          <p className="text-sm text-gray-500">가입한 회원이 없습니다.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">가입한 회원이 없습니다.</p>
         ) : (
           <div className="grid gap-2">
             {recentMembers.map((member, index) => (
-              <div key={index} className="border rounded-lg p-3 bg-white">
+              <div
+                key={index}
+                className="border border-gray-200 dark:border-[#404040] rounded-lg p-3 bg-white dark:bg-[#2d2d2d] transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <img
                     src="/icons/profile.jpg"
@@ -83,10 +86,12 @@ export default function AdminMy() {
                     className="w-8 h-8 rounded-full object-cover"
                   />
                   <div className="flex-1">
-                    <div className="font-semibold text-black">{member.nickname}</div>
-                    <div className="text-xs text-gray-600">{member.email}</div>
+                    <div className="font-semibold text-black dark:text-white">{member.nickname}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">{member.email}</div>
                   </div>
-                  <div className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">회원</div>
+                  <div className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded">
+                    회원
+                  </div>
                 </div>
               </div>
             ))}

@@ -6,10 +6,16 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { formatDisplayDate } from '@/utils/date';
 
 export default function AdminClassCalendar() {
-  const [classes] = useLocalStorage<any[]>('admin_classes', []);
+  const [classes, setClasses] = useLocalStorage<any[]>('admin_classes', []);
   const [savedWods] = useLocalStorage<any[]>('wod_admin_saved', []);
   const [reservations] = useLocalStorage<any[]>('reserved_wods', []);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  const handleDeleteClass = (classId: string) => {
+    if (!confirm('이 수업을 삭제하시겠습니까?')) return;
+    const next = classes.filter((c) => c.id !== classId);
+    setClasses(next);
+  };
 
   const markedDates = useMemo(() => {
     return classes.map((classItem) => classItem.date);
@@ -73,7 +79,15 @@ export default function AdminClassCalendar() {
                             정원: {classItem.capacity}명 | 예약: {reservationCount}명
                           </div>
                         </div>
-                        <div className="text-xs px-2 py-1 bg-blue-500 text-white rounded">수업</div>
+                        <div className="flex items-center gap-2">
+                          <div className="text-xs px-2 py-1 bg-blue-500 text-white rounded">수업</div>
+                          <button
+                            onClick={() => handleDeleteClass(classItem.id)}
+                            className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+                          >
+                            삭제
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );

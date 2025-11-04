@@ -18,6 +18,8 @@ import AdminClassCalendar from '@/pages/AdminClassCalendar.tsx';
 import AdminMembers from '@/pages/AdminMembers.tsx';
 import AdminClassDetail from '@/pages/AdminClassDetail.tsx';
 import Settings from '@/pages/Settings.tsx';
+import NotificationSettings from '@/pages/NotificationSettings.tsx';
+import PasswordChange from '@/pages/PasswordChange.tsx';
 import MemberProfile from '@/pages/MemberProfile.tsx';
 import MemberWod from '@/pages/MemberWod.tsx';
 import MemberBenchmarks from '@/pages/MemberBenchmarks.tsx';
@@ -150,6 +152,8 @@ export const router = createBrowserRouter([
       // Extras
       { path: 'leaderboard', element: <Leaderboard /> },
       { path: 'settings', element: <Settings /> },
+      { path: 'settings/notification', element: <NotificationSettings /> },
+      { path: 'settings/password', element: <PasswordChange /> },
     ],
   },
   {

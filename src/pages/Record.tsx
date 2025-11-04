@@ -2,6 +2,7 @@ import { wodSort } from '@/api/wodSort';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useWod } from '@/hooks/useWod';
+import { getToday } from '@/utils/date';
 
 export default function Record() {
   const [text, setText] = useState('');
@@ -201,7 +202,7 @@ export default function Record() {
       const finalTags = labels.length > 0 ? labels : autoTags;
 
       const newRecord = {
-        date: new Date().toISOString().split('T')[0],
+        date: getToday(), // 로컬 시간 기준으로 오늘 날짜 사용
         text,
         time,
         exercises,
@@ -335,12 +336,18 @@ export default function Record() {
               onChange={(e) => handleExerciseChange(idx, 'name', e.target.value)}
               placeholder="Enter the name of exercise"
               className="flex-1 h-8 border-b border-gray-300 text-sm py-1 text-black placeholder-gray-400 focus:outline-none focus:border-[#6D4C1D]"
+              inputMode="text"
+              lang="en"
+              autoComplete="off"
             />
             <input
               value={ex.weight}
               onChange={(e) => handleExerciseChange(idx, 'weight', e.target.value)}
               placeholder="-"
               className="w-16 h-8 border-b border-gray-300 text-sm text-center text-black placeholder-gray-400 focus:outline-none focus:border-[#6D4C1D]"
+              inputMode="decimal"
+              lang="en"
+              autoComplete="off"
             />
             <span className="text-sm text-gray-500 h-8 flex items-center">lbs</span>
           </div>

@@ -4,7 +4,12 @@ export const formatDate = (date: string | Date): string => {
 };
 
 export const getToday = (): string => {
-  return new Date().toISOString().slice(0, 10);
+  // 로컬 시간 기준으로 오늘 날짜 반환 (타임존 문제 해결)
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 export const formatDisplayDate = (date: string): string => {

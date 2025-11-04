@@ -13,7 +13,9 @@ export default function MemberProfile() {
   return (
     <PageContainer>
       <PageHeader title="프로필 정보" />
-      <ProfileForm onSave={handleSave} />
+      <div className="mt-4">
+        <ProfileForm onSave={handleSave} />
+      </div>
     </PageContainer>
   );
 }

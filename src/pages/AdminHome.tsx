@@ -1,12 +1,11 @@
 import { Link } from 'react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ClassCard } from '@/components/cards/ClassCard';
 import { Calendar } from '@/components/interactive/Calendar';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { PageHeader } from '@/components/layout/PageHeader';
 import { useMemo } from 'react';
-import { getToday } from '@/utils/date';
+import { getToday, formatDisplayDate } from '@/utils/date';
 
 type SavedClass = {
   id: string;
@@ -30,7 +29,14 @@ export default function AdminHome() {
   const [savedWods] = useLocalStorage<SavedWod[]>('wod_admin_saved', []);
   const [classes] = useLocalStorage<SavedClass[]>('admin_classes', []);
   const [reservations] = useLocalStorage<ReservedWod[]>('reserved_wods', []);
-  const [selectedDate, setSelectedDate] = useState<string | null>(getToday());
+  const today = getToday();
+  const [selectedDate, setSelectedDate] = useState<string | null>(today);
+
+  // 컴포넌트 마운트 시 오늘 날짜로 확실히 설정
+  useEffect(() => {
+    const currentToday = getToday();
+    setSelectedDate(currentToday);
+  }, []);
 
   const todayClasses = useMemo(() => {
     if (!selectedDate) return [];
@@ -60,8 +66,6 @@ export default function AdminHome() {
 
   return (
     <PageContainer>
-      <PageHeader title="관리자 홈" />
-
       {/* 캘린더 */}
       <div className="mt-4">
         <Calendar
@@ -75,7 +79,7 @@ export default function AdminHome() {
       {/* 액션 버튼 */}
       <div className="mt-6 grid grid-cols-2 gap-3">
         <Link
-          to="/admin"
+          to={selectedDate ? `/admin?date=${selectedDate}` : '/admin'}
           className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-[#63461E] to-[#8B5A2B] p-4 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
         >
           <div className="relative z-10">
@@ -102,17 +106,17 @@ export default function AdminHome() {
       {/* 선택한 날짜의 수업 목록 */}
       {selectedDate && (
         <div className="mt-6">
-          <h3 className="mb-3 text-lg font-semibold text-gray-800">
-            {selectedDate === getToday() ? '오늘의 수업' : `${selectedDate} 수업`}
-            <span className="ml-2 text-sm font-normal text-gray-500">
+          <h3 className="mb-3 text-lg font-semibold text-gray-800 dark:text-white">
+            {selectedDate === today ? '오늘의 수업' : `${formatDisplayDate(selectedDate)} 수업`}
+            <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
               ({todayClasses.length}개)
             </span>
           </h3>
 
           {todayClasses.length === 0 ? (
-            <div className="rounded-lg border-2 border-dashed border-gray-200 bg-gray-50 p-8 text-center">
+            <div className="rounded-lg border-2 border-dashed border-gray-200 dark:border-[#404040] bg-gray-50 dark:bg-[#3a3a3a] p-8 text-center">
               <div className="mb-2 text-4xl">📭</div>
-              <p className="text-sm text-gray-500">등록된 수업이 없습니다.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">등록된 수업이 없습니다.</p>
             </div>
           ) : (
             <div className="grid gap-3">
