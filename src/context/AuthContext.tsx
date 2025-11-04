@@ -147,7 +147,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.removeItem('token_expiry');
     setUser(null);
     setIsLoggedIn(false);
-    window.location.href = '/auth/login';
+    // Vercel 배포 환경에서도 정상 작동하도록 window.location 사용
+    window.location.href = window.location.origin + '/auth/login';
   };
 
   const updateUser = (updates: Partial<User>) => {
