@@ -9,3 +9,4 @@ export const navRoutes = [
   { label: '수업 예약', path: '/reservation', icon: 'calendar', element: <Reservation /> },
   { label: 'MY', path: '/my', icon: 'my', element: <My /> },
 ];
+ 
