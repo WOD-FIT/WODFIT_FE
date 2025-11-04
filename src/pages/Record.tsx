@@ -137,30 +137,30 @@ export default function Record() {
         weights: [averageWeight],
       };
 
-      let labels: string[] = [];
-      try {
-        // API 호출 타임아웃 설정 (2초)
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('타임아웃')), 2000),
-        );
-        const apiPromise = wodSort(requestBody);
-        const response = (await Promise.race([apiPromise, timeoutPromise])) as any;
-        labels = Array.isArray(response?.labels) ? response.labels : [];
-      } catch (e) {
-        // API 실패해도 저장은 진행 (타임아웃 포함)
-        labels = [];
-      }
+      // API 호출과 최소 대기 시간을 동시에 처리
+      const apiCallPromise = (async () => {
+        try {
+          const response = await wodSort(requestBody);
+          return Array.isArray(response?.labels) ? response.labels : [];
+        } catch {
+          return [];
+        }
+      })();
+
+      const minimumWaitPromise = new Promise<void>((resolve) => {
+        setTimeout(resolve, 2000); // 최소 2초 대기
+      });
+
+      // API 호출과 최소 대기 시간을 모두 기다림
+      const [labels] = await Promise.all([apiCallPromise, minimumWaitPromise]);
 
       // 기존 WOD 개수를 확인하여 홀수/짝수에 따라 태그 결정
       const existingWods = JSON.parse(localStorage.getItem('wods') || '[]');
-      const nextWodIndex = existingWods.length + 1; // 새로 추가될 WOD의 인덱스
+      const nextWodIndex = existingWods.length + 1;
 
       // 홀수번째(1, 3, 5...): #Interval, #Run
       // 짝수번째(2, 4, 6...): #Metcon, #Barbell
-      const autoTags =
-        nextWodIndex % 2 === 1
-          ? ['Interval', 'Run'] // 홀수번째
-          : ['Metcon', 'Barbell']; // 짝수번째
+      const autoTags = nextWodIndex % 2 === 1 ? ['Interval', 'Run'] : ['Metcon', 'Barbell'];
 
       // API로 받은 labels가 있으면 사용, 없으면 자동 태그 사용
       const finalTags = labels.length > 0 ? labels : autoTags;
