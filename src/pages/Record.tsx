@@ -66,10 +66,17 @@ export default function Record() {
         // My.tsx에서 전달하는 경우: 문자열 ID
         // Admin에서 전달하는 경우: JSON 객체
         let editData: any;
+        let editId: string | null = null;
+
         try {
           editData = JSON.parse(raw);
+          // JSON 객체인 경우 id 필드 추출
+          if (editData && editData.id) {
+            editId = editData.id;
+          }
         } catch {
           // 문자열 ID인 경우
+          editId = raw;
           const allWods = JSON.parse(localStorage.getItem('wods') || '[]');
           const foundWod = allWods.find((w: any) => w.id === raw);
           if (foundWod) {
@@ -77,7 +84,17 @@ export default function Record() {
           }
         }
 
-        if (editData) {
+        // editId가 있으면 실제 WOD를 찾아서 검증
+        if (editId && !editData) {
+          const allWods = JSON.parse(localStorage.getItem('wods') || '[]');
+          const foundWod = allWods.find((w: any) => w.id === editId);
+          if (foundWod) {
+            editData = foundWod;
+          }
+        }
+
+        if (editData && (editData.text || (editData.title && editData.description))) {
+          // 실제 편집할 데이터가 있는 경우에만 편집 모드로 처리
           console.log('편집 모드로 로드:', editData);
 
           // Admin에서 전달된 WOD 정보 로드
@@ -88,19 +105,23 @@ export default function Record() {
           }
           setTime(editData.time || { min: '', sec: '' });
           setExercises(editData.exercises || [{ name: '', weight: '' }]);
+          return;
         } else {
-          // 편집할 WOD를 찾지 못한 경우
+          // 편집할 WOD를 찾지 못한 경우 - 일반 작성 모드로 전환
+          console.log('편집할 WOD를 찾지 못함, 일반 작성 모드로 전환');
+          localStorage.removeItem('edit_wod');
           setText('');
           setTime({ min: '', sec: '' });
           setExercises([{ name: '', weight: '' }]);
         }
       } catch (error) {
         console.error('Error loading edit WOD:', error);
+        // 에러 발생 시에도 일반 작성 모드로 전환
+        localStorage.removeItem('edit_wod');
         setText('');
         setTime({ min: '', sec: '' });
         setExercises([{ name: '', weight: '' }]);
       }
-      return;
     }
 
     // 3. 일반 WOD 작성 모드 (기본) - WOD Text 비어있음
@@ -189,7 +210,7 @@ export default function Record() {
 
       const edit = localStorage.getItem('edit_wod');
       if (edit) {
-        // 편집 모드인 경우
+        // 편집 모드인 경우 - 실제로 수정할 WOD가 있는지 검증
         const prev = JSON.parse(localStorage.getItem('wods') || '[]');
         let editId: string;
 
@@ -200,16 +221,30 @@ export default function Record() {
           editId = edit;
         }
 
-        const updatedRecord = { ...newRecord, id: editId };
-        const next = prev.map((w: any) => (w.id === editId ? updatedRecord : w));
+        // 실제로 수정할 WOD가 존재하는지 확인
+        const existingWod = prev.find((w: any) => w.id === editId);
 
-        localStorage.setItem('wods', JSON.stringify(next));
-        localStorage.removeItem('edit_wod');
+        if (existingWod) {
+          // 실제로 수정할 WOD가 있는 경우에만 수정 처리
+          const updatedRecord = { ...newRecord, id: editId };
+          const next = prev.map((w: any) => (w.id === editId ? updatedRecord : w));
 
-        alert('WOD 수정이 완료되었습니다!');
-        navigate('/my');
-        return;
-      } else {
+          localStorage.setItem('wods', JSON.stringify(next));
+          localStorage.removeItem('edit_wod');
+
+          alert('WOD 수정이 완료되었습니다!');
+          navigate('/my');
+          return;
+        } else {
+          // 수정할 WOD가 없으면 일반 저장으로 처리
+          console.log('수정할 WOD를 찾지 못함, 일반 저장으로 처리');
+          localStorage.removeItem('edit_wod');
+          // 아래 새 WOD 추가 로직으로 진행
+        }
+      }
+
+      // 새 WOD 추가 (edit_wod가 없거나, 수정할 WOD를 찾지 못한 경우)
+      {
         // 새 WOD 추가
         addWod(newRecord);
 

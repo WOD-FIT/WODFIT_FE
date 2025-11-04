@@ -58,14 +58,23 @@ export default function Admin() {
       persistList(next);
       setMessage('오늘의 WOD가 등록되었습니다.');
 
-      // 새로 등록된 WOD의 ID를 저장하여 수정 모드로 전환
       if (!editingId) {
-        const newWodId = next[0].id; // 새로 추가된 WOD의 ID
-        localStorage.setItem('edit_wod', JSON.stringify({ id: newWodId, ...form }));
-        // 수정 페이지로 이동
+        // 새로 등록된 WOD의 ID
+        const newWodId = next[0].id;
+
+        // 수업 등록 확인 팝업
         setTimeout(() => {
-          window.location.href = '/record';
-        }, 1000);
+          const shouldRegisterClass = confirm('등록한 WOD로 수업등록하시겠습니까?');
+
+          if (shouldRegisterClass) {
+            // 수업 등록 페이지로 이동하고, 방금 등록한 WOD를 미리 선택
+            localStorage.setItem('selected_wod_for_class', newWodId);
+            window.location.href = '/admin/class';
+          } else {
+            // 폼 초기화
+            setForm({ date: today, title: '', description: '' });
+          }
+        }, 500);
       } else {
         setForm((prev) => ({ ...prev, title: '', description: '' }));
       }

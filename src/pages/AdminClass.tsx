@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ClassCard } from '@/components/cards/ClassCard';
 import { PageContainer } from '@/components/layout/PageContainer';
@@ -46,6 +46,16 @@ export default function AdminClass() {
       return reservations.filter((r) => r.wodId === classId && r.date === date).length;
     };
   }, [reservations]);
+
+  // WOD 등록 후 수업 등록 페이지로 이동했을 때, 선택된 WOD를 자동으로 설정
+  useEffect(() => {
+    const selectedWodId = localStorage.getItem('selected_wod_for_class');
+    if (selectedWodId) {
+      setFormData((prev) => ({ ...prev, wodId: selectedWodId }));
+      // 사용 후 제거
+      localStorage.removeItem('selected_wod_for_class');
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
