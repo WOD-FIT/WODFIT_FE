@@ -61,18 +61,32 @@ export default function My() {
         <p className="text-sm text-gray-500">아직 WOD 기록이 없습니다. 기록을 추가해보세요.</p>
       ) : (
         <div className="flex flex-col gap-4">
-          {wods.map((wod) => (
-            <WodCard
-              key={wod.id}
-              date={wod.date}
-              text={wod.text}
-              tags={wod.tags}
-              time={wod.time}
-              showActions
-              onEdit={() => handleEditWod(wod.id)}
-              onDelete={() => handleDeleteWod(wod.id)}
-            />
-          ))}
+          {wods.map((wod, index) => {
+            // 홀수번째(1, 3, 5...): #Interval, #Run
+            // 짝수번째(2, 4, 6...): #Metcon, #Barbell
+            // index는 0부터 시작하므로 1을 더해서 계산
+            const wodIndex = index + 1;
+            const autoTags =
+              wodIndex % 2 === 1
+                ? ['Interval', 'Run'] // 홀수번째
+                : ['Metcon', 'Barbell']; // 짝수번째
+
+            // 기존 tags가 있으면 사용, 없으면 자동 태그 사용
+            const displayTags = wod.tags && wod.tags.length > 0 ? wod.tags : autoTags;
+
+            return (
+              <WodCard
+                key={wod.id}
+                date={wod.date}
+                text={wod.text}
+                tags={displayTags}
+                time={wod.time}
+                showActions
+                onEdit={() => handleEditWod(wod.id)}
+                onDelete={() => handleDeleteWod(wod.id)}
+              />
+            );
+          })}
         </div>
       )}
     </PageContainer>

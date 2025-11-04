@@ -165,12 +165,26 @@ export default function Record() {
         labels = [];
       }
 
+      // 기존 WOD 개수를 확인하여 홀수/짝수에 따라 태그 결정
+      const existingWods = JSON.parse(localStorage.getItem('wods') || '[]');
+      const nextWodIndex = existingWods.length + 1; // 새로 추가될 WOD의 인덱스
+
+      // 홀수번째(1, 3, 5...): #Interval, #Run
+      // 짝수번째(2, 4, 6...): #Metcon, #Barbell
+      const autoTags =
+        nextWodIndex % 2 === 1
+          ? ['Interval', 'Run'] // 홀수번째
+          : ['Metcon', 'Barbell']; // 짝수번째
+
+      // API로 받은 labels가 있으면 사용, 없으면 자동 태그 사용
+      const finalTags = labels.length > 0 ? labels : autoTags;
+
       const newRecord = {
         date: new Date().toISOString().split('T')[0],
         text,
         time,
         exercises,
-        tags: labels,
+        tags: finalTags,
       };
 
       const edit = localStorage.getItem('edit_wod');
