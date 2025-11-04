@@ -49,15 +49,14 @@ export default function Home() {
             </div>
             <button
               onClick={() => {
-                // 수업 완료 후 작성 모드로 이동
-                localStorage.setItem(
-                  'class_wod_write',
-                  JSON.stringify({
-                    id: todayWod.id,
-                    title: todayWod.title,
-                    description: todayWod.description,
-                  }),
-                );
+                // 수업 완료 후 작성 모드로 이동 - 수업 WOD 내용을 전달
+                const classWodData = {
+                  id: todayWod.id,
+                  title: todayWod.title,
+                  description: todayWod.description,
+                };
+                console.log('수업 WOD 데이터 저장:', classWodData);
+                localStorage.setItem('class_wod_write', JSON.stringify(classWodData));
                 window.location.href = '/record?mode=class';
               }}
               className="w-full px-4 h-9 rounded-lg bg-[#63461E] text-white font-medium"

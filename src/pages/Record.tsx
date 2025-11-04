@@ -12,27 +12,46 @@ export default function Record() {
   const mode = searchParams.get('mode'); // 'class' 또는 null
   const { addWod } = useWod();
 
-  // 페이지 로드 시 초기화
+  // 페이지 로드 시 초기화 (한 번만 실행)
   useEffect(() => {
     console.log('Record 페이지 로드, mode:', mode);
 
     // 1. 수업 완료 후 작성 모드 (우선순위 1)
-    const classWodData = localStorage.getItem('class_wod_write');
-    if (mode === 'class' && classWodData) {
-      try {
-        const classWod = JSON.parse(classWodData);
-        // 수업 WOD 내용을 WOD Text 필드에 자동으로 채우기
-        const wodText = `${classWod.title}\n\n${classWod.description}`;
-        setText(wodText);
-        setTime({ min: '', sec: '' });
-        setExercises([{ name: '', weight: '' }]);
-        // 사용 후 제거
-        localStorage.removeItem('class_wod_write');
-        console.log('✅ 수업 WOD 모드: WOD Text 자동 채움', wodText);
-        return;
-      } catch (error) {
-        console.error('수업 WOD 데이터 파싱 실패:', error);
-        // 에러 시 빈 상태로 초기화
+    if (mode === 'class') {
+      const classWodData = localStorage.getItem('class_wod_write');
+      console.log('Record 페이지 - classWodData:', classWodData);
+
+      if (classWodData) {
+        try {
+          const classWod = JSON.parse(classWodData);
+          console.log('수업 WOD 데이터 파싱 성공:', classWod);
+
+          // 수업 WOD 내용을 WOD Text 필드에 자동으로 채우기
+          // title과 description을 합쳐서 표시 (예: "For Time - 5RFT\n\n800-meter run\n40 wall-ball shots...")
+          const wodText = classWod.title
+            ? `${classWod.title}\n\n${classWod.description || ''}`
+            : classWod.description || '';
+
+          setText(wodText.trim());
+          setTime({ min: '', sec: '' });
+          setExercises([{ name: '', weight: '' }]);
+
+          console.log('✅ 수업 WOD 모드: WOD Text 자동 채움 완료');
+          console.log('WOD Text 내용:', wodText);
+
+          // localStorage는 저장할 때 제거하므로 여기서는 유지
+          return;
+        } catch (error) {
+          console.error('수업 WOD 데이터 파싱 실패:', error);
+          // 에러 시 빈 상태로 초기화
+          setText('');
+          setTime({ min: '', sec: '' });
+          setExercises([{ name: '', weight: '' }]);
+          return;
+        }
+      } else {
+        // mode=class인데 데이터가 없으면 일반 모드로
+        console.log('수업 모드이지만 데이터 없음, 일반 모드로 전환');
         setText('');
         setTime({ min: '', sec: '' });
         setExercises([{ name: '', weight: '' }]);
@@ -85,11 +104,13 @@ export default function Record() {
     }
 
     // 3. 일반 WOD 작성 모드 (기본) - WOD Text 비어있음
-    console.log('일반 WOD 작성 모드: WOD Text 비어있음');
-    setText('');
-    setTime({ min: '', sec: '' });
-    setExercises([{ name: '', weight: '' }]);
-  }, [mode]);
+    if (mode !== 'class') {
+      console.log('일반 WOD 작성 모드: WOD Text 비어있음');
+      setText('');
+      setTime({ min: '', sec: '' });
+      setExercises([{ name: '', weight: '' }]);
+    }
+  }, [mode]); // mode가 변경될 때만 실행
 
   const navigate = useNavigate();
 
@@ -182,6 +203,11 @@ export default function Record() {
         const savedWods = JSON.parse(localStorage.getItem('wods') || '[]');
         console.log('저장 후 localStorage 확인:', savedWods);
         console.log('저장된 WOD 개수:', savedWods.length);
+
+        // 수업 WOD 모드였다면 localStorage 정리
+        if (mode === 'class') {
+          localStorage.removeItem('class_wod_write');
+        }
 
         // 커스텀 이벤트 트리거하여 다른 컴포넌트에 알림
         window.dispatchEvent(new CustomEvent('wodsUpdated', { detail: savedWods }));

@@ -13,7 +13,7 @@ export const wodSort = async ({ wods, weights }: WodSortProps) => {
       weights,
     },
     {
-      timeout: 2000, // 2초 타임아웃
+      timeout: 500, // 0.5초 타임아웃
     },
   );
   console.log(response);
