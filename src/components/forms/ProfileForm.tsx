@@ -2,15 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { isValidAge, isValidHeight, isValidWeight } from '@/utils/validator';
-
-type Profile = {
-  name: string;
-  age: number | '';
-  heightCm: number | '';
-  weightKg: number | '';
-  muscleKg: number | '';
-  boxName?: string;
-};
+import type { Profile } from '@/types';
 
 type ProfileFormProps = {
   onSave?: () => void;

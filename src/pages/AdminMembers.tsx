@@ -3,21 +3,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { WodCard } from '@/components/cards/WodCard';
-
-type User = {
-  email: string;
-  nickname: string;
-  role: 'member' | 'coach';
-};
-
-type WodEntry = {
-  id: string;
-  date: string;
-  text: string;
-  time: { min: string; sec: string };
-  exercises: { name: string; weight: string }[];
-  tags?: string[];
-};
+import type { User, WodEntry } from '@/types';
 
 export default function AdminMembers() {
   const [allUsers, setAllUsers] = useLocalStorage<User[]>('users', []);

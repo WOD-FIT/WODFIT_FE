@@ -1,14 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { getToday } from '@/utils/date';
-
-type WodPayload = {
-  date: string; // YYYY-MM-DD
-  title: string;
-  description: string;
-};
-
-type SavedWod = WodPayload & { id: string };
+import type { WodPayload, SavedWod } from '@/types';
 
 export default function Admin() {
   const [searchParams] = useSearchParams();

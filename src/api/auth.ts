@@ -43,8 +43,6 @@ export const login = async (email: string, password: string) => {
     const response = await api.post('/auth/login', { email, password });
     return response.data;
   } catch (error) {
-    // 목업 폴백: 로컬 사용자 조회
-    console.log('API 로그인 실패, 로컬 사용자 조회 시도:', email);
     const usersRaw = localStorage.getItem('users') || '[]';
     let users: Array<{
       email: string;
@@ -55,20 +53,16 @@ export const login = async (email: string, password: string) => {
 
     try {
       users = JSON.parse(usersRaw);
-    } catch (e) {
-      console.error('사용자 데이터 파싱 실패:', e);
+    } catch {
       users = [];
     }
 
-    console.log('저장된 사용자 수:', users.length);
     const found = users.find((u) => u.email === email && u.password === password);
 
     if (!found) {
-      console.error('사용자를 찾을 수 없음:', email);
       throw new Error('이메일 또는 비밀번호가 올바르지 않습니다.');
     }
 
-    console.log('로컬 사용자 로그인 성공:', found);
     return { accessToken: 'mock-token', user: found } as any;
   }
 };

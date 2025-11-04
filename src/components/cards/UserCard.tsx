@@ -1,7 +1,7 @@
 import { useAuth } from '@/hooks/useAuth';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
-type Profile = {
+type UserProfile = {
   boxName?: string;
 };
 
@@ -9,7 +9,7 @@ export const UserCard = () => {
   const { user } = useAuth();
   // 사용자별로 프로필을 분리하여 저장
   const profileKey = user?.email ? `member_profile_${user.email}` : 'member_profile';
-  const [profile] = useLocalStorage<Profile>(profileKey, {});
+  const [profile] = useLocalStorage<UserProfile>(profileKey, {});
 
   return (
     <div className="flex items-center gap-4 mb-6">

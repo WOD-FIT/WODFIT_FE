@@ -1,21 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-
-type WodEntry = {
-  id: string;
-  date: string;
-  text: string;
-  time: { min: string; sec: string };
-  exercises: { name: string; weight: string }[];
-  tags?: string[];
-};
-
-type SavedWod = {
-  id: string;
-  date: string;
-  title: string;
-  description: string;
-};
+import type { WodEntry, SavedWod } from '@/types';
 
 type WodContextType = {
   wods: WodEntry[];
@@ -46,49 +31,40 @@ export const WodProvider = ({ children }: WodProviderProps) => {
   const [wods, setWods] = useState<WodEntry[]>([]);
   const [savedWods, setSavedWods] = useState<SavedWod[]>([]);
 
-  // localStorage에서 데이터 로드 함수
-  const loadWods = () => {
-    const wodsData = localStorage.getItem('wods');
-    const savedWodsData = localStorage.getItem('wod_admin_saved');
+  const loadWods = useCallback(() => {
+    try {
+      const wodsData = localStorage.getItem('wods');
+      const savedWodsData = localStorage.getItem('wod_admin_saved');
 
-    if (wodsData) {
-      try {
+      if (wodsData) {
         const parsed = JSON.parse(wodsData);
         setWods(parsed);
-        console.log('WOD 데이터 로드 완료:', parsed.length, '개');
-      } catch (error) {
-        console.error('WOD 데이터 파싱 실패:', error);
+      } else {
         setWods([]);
       }
-    } else {
-      setWods([]);
-    }
 
-    if (savedWodsData) {
-      try {
+      if (savedWodsData) {
         setSavedWods(JSON.parse(savedWodsData));
-      } catch (error) {
-        console.error('저장된 WOD 데이터 파싱 실패:', error);
+      } else {
         setSavedWods([]);
       }
+    } catch {
+      setWods([]);
+      setSavedWods([]);
     }
-  };
+  }, []);
 
   useEffect(() => {
     // 초기 로드
     loadWods();
 
-    // storage 이벤트 리스너 추가 (다른 탭에서 localStorage 변경 시 동기화)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'wods') {
-        console.log('wods localStorage 변경 감지 (다른 탭), 재로드');
         loadWods();
       }
     };
 
-    // 커스텀 이벤트 리스너 추가 (같은 탭에서 localStorage 변경 시 동기화)
     const handleWodsUpdated = () => {
-      console.log('wodsUpdated 이벤트 감지, 재로드');
       loadWods();
     };
 
@@ -107,57 +83,58 @@ export const WodProvider = ({ children }: WodProviderProps) => {
       window.removeEventListener('wodsUpdated', handleWodsUpdated);
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [loadWods]);
 
-  const addWod = (wod: Omit<WodEntry, 'id'>) => {
+  const addWod = useCallback((wod: Omit<WodEntry, 'id'>) => {
     const newWod = { ...wod, id: crypto.randomUUID() };
-    // localStorage에서 최신 데이터를 읽어서 추가 (state 동기화 문제 방지)
     const existingWods = JSON.parse(localStorage.getItem('wods') || '[]');
     const updatedWods = [newWod, ...existingWods];
 
-    // localStorage에 먼저 저장
     localStorage.setItem('wods', JSON.stringify(updatedWods));
-
-    // state 업데이트
     setWods(updatedWods);
-
-    console.log('WOD 추가 완료:', newWod);
-    console.log('전체 WOD 개수:', updatedWods.length);
-
-    // 커스텀 이벤트를 트리거하여 다른 컴포넌트에 알림
     window.dispatchEvent(new CustomEvent('wodsUpdated', { detail: updatedWods }));
-  };
+  }, []);
 
-  const updateWod = (id: string, updates: Partial<WodEntry>) => {
-    const updatedWods = wods.map((wod) => (wod.id === id ? { ...wod, ...updates } : wod));
-    setWods(updatedWods);
-    localStorage.setItem('wods', JSON.stringify(updatedWods));
-  };
+  const updateWod = useCallback((id: string, updates: Partial<WodEntry>) => {
+    setWods((prev) => {
+      const updated = prev.map((wod) => (wod.id === id ? { ...wod, ...updates } : wod));
+      localStorage.setItem('wods', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
 
-  const deleteWod = (id: string) => {
-    const updatedWods = wods.filter((wod) => wod.id !== id);
-    setWods(updatedWods);
-    localStorage.setItem('wods', JSON.stringify(updatedWods));
-  };
+  const deleteWod = useCallback((id: string) => {
+    setWods((prev) => {
+      const updated = prev.filter((wod) => wod.id !== id);
+      localStorage.setItem('wods', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
 
-  const addSavedWod = (wod: Omit<SavedWod, 'id'>) => {
+  const addSavedWod = useCallback((wod: Omit<SavedWod, 'id'>) => {
     const newWod = { ...wod, id: crypto.randomUUID() };
-    const updatedWods = [newWod, ...savedWods];
-    setSavedWods(updatedWods);
-    localStorage.setItem('wod_admin_saved', JSON.stringify(updatedWods));
-  };
+    setSavedWods((prev) => {
+      const updated = [newWod, ...prev];
+      localStorage.setItem('wod_admin_saved', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
 
-  const updateSavedWod = (id: string, updates: Partial<SavedWod>) => {
-    const updatedWods = savedWods.map((wod) => (wod.id === id ? { ...wod, ...updates } : wod));
-    setSavedWods(updatedWods);
-    localStorage.setItem('wod_admin_saved', JSON.stringify(updatedWods));
-  };
+  const updateSavedWod = useCallback((id: string, updates: Partial<SavedWod>) => {
+    setSavedWods((prev) => {
+      const updated = prev.map((wod) => (wod.id === id ? { ...wod, ...updates } : wod));
+      localStorage.setItem('wod_admin_saved', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
 
-  const deleteSavedWod = (id: string) => {
-    const updatedWods = savedWods.filter((wod) => wod.id !== id);
-    setSavedWods(updatedWods);
-    localStorage.setItem('wod_admin_saved', JSON.stringify(updatedWods));
-  };
+  const deleteSavedWod = useCallback((id: string) => {
+    setSavedWods((prev) => {
+      const updated = prev.filter((wod) => wod.id !== id);
+      localStorage.setItem('wod_admin_saved', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
 
   return (
     <WodContext.Provider

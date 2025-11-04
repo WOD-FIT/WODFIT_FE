@@ -1,11 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-
-type User = {
-  email: string;
-  nickname: string;
-  role: 'member' | 'coach';
-};
+import type { User } from '@/types';
 
 type AuthContextType = {
   user: User | null;
@@ -39,11 +34,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const userData = localStorage.getItem('current_user');
     const tokenExpiry = localStorage.getItem('token_expiry');
 
-    // 토큰 만료 시간 체크 (1년 후 만료)
     const now = Date.now();
     if (tokenExpiry && Number(tokenExpiry) < now) {
-      // 토큰이 만료된 경우
-      console.log('Token expired, logging out');
       localStorage.removeItem('token');
       localStorage.removeItem('current_user');
       localStorage.removeItem('token_expiry');
@@ -58,13 +50,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(parsedUser);
         setIsLoggedIn(true);
 
-        // 토큰 만료 시간이 없으면 1년 후로 설정
         if (!tokenExpiry) {
-          const oneYearLater = now + 365 * 24 * 60 * 60 * 1000; // 1년 후
+          const oneYearLater = now + 365 * 24 * 60 * 60 * 1000;
           localStorage.setItem('token_expiry', oneYearLater.toString());
         }
-      } catch (error) {
-        console.error('Failed to parse user data:', error);
+      } catch {
         localStorage.removeItem('token');
         localStorage.removeItem('current_user');
         localStorage.removeItem('token_expiry');
@@ -103,61 +93,52 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
   }, [restoreAuth]);
 
-  const login = async (email: string, password: string) => {
-    try {
-      console.log('로그인 시도:', email);
-      const { login: loginAPI } = await import('@/api/auth');
-      const res = await loginAPI(email, password);
+  const login = useCallback(async (email: string, password: string) => {
+    const { login: loginAPI } = await import('@/api/auth');
+    const res = await loginAPI(email, password);
 
-      console.log('로그인 API 응답:', res);
-
-      if (!res || !res.accessToken) {
-        throw new Error('로그인 응답이 올바르지 않습니다.');
-      }
-
-      localStorage.setItem('token', res.accessToken);
-      if (res.user) {
-        const userData = {
-          email: res.user.email,
-          nickname: res.user.nickname,
-          role: res.user.role || 'member',
-        };
-        localStorage.setItem('current_user', JSON.stringify(userData));
-
-        // 토큰 만료 시간 설정 (1년 후)
-        const oneYearLater = Date.now() + 365 * 24 * 60 * 60 * 1000;
-        localStorage.setItem('token_expiry', oneYearLater.toString());
-
-        setUser(userData);
-        setIsLoggedIn(true);
-
-        console.log('로그인 성공:', userData);
-      } else {
-        throw new Error('사용자 정보가 없습니다.');
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
+    if (!res?.accessToken) {
+      throw new Error('로그인 응답이 올바르지 않습니다.');
     }
-  };
 
-  const logout = () => {
+    localStorage.setItem('token', res.accessToken);
+    if (res.user) {
+      const userData: User = {
+        email: res.user.email,
+        nickname: res.user.nickname,
+        role: res.user.role || 'member',
+      };
+      localStorage.setItem('current_user', JSON.stringify(userData));
+
+      const oneYearLater = Date.now() + 365 * 24 * 60 * 60 * 1000;
+      localStorage.setItem('token_expiry', oneYearLater.toString());
+
+      setUser(userData);
+      setIsLoggedIn(true);
+    } else {
+      throw new Error('사용자 정보가 없습니다.');
+    }
+  }, []);
+
+  const logout = useCallback(() => {
     localStorage.removeItem('token');
     localStorage.removeItem('current_user');
     localStorage.removeItem('token_expiry');
     setUser(null);
     setIsLoggedIn(false);
-    // Vercel 배포 환경에서도 정상 작동하도록 window.location 사용
-    window.location.href = window.location.origin + '/auth/login';
-  };
+    window.location.href = `${window.location.origin}/auth/login`;
+  }, []);
 
-  const updateUser = (updates: Partial<User>) => {
-    if (user) {
-      const updatedUser = { ...user, ...updates };
-      setUser(updatedUser);
-      localStorage.setItem('current_user', JSON.stringify(updatedUser));
-    }
-  };
+  const updateUser = useCallback(
+    (updates: Partial<User>) => {
+      if (user) {
+        const updatedUser = { ...user, ...updates };
+        setUser(updatedUser);
+        localStorage.setItem('current_user', JSON.stringify(updatedUser));
+      }
+    },
+    [user],
+  );
 
   return (
     <AuthContext.Provider value={{ user, isLoggedIn, login, logout, updateUser }}>

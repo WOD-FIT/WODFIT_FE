@@ -1,33 +1,15 @@
 import { Link } from 'react-router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ClassCard } from '@/components/cards/ClassCard';
 import { Calendar } from '@/components/interactive/Calendar';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { useMemo } from 'react';
 import { getToday, formatDisplayDate } from '@/utils/date';
-
-type SavedClass = {
-  id: string;
-  date: string;
-  time: string;
-  location: string;
-  wodId: string;
-  capacity: number;
-};
-
-type SavedWod = {
-  id: string;
-  date: string;
-  title: string;
-  description: string;
-};
-
-type ReservedWod = { wodId: string; date: string; userId?: string; userNickname?: string };
+import type { Class, SavedWod, ReservedWod } from '@/types';
 
 export default function AdminHome() {
   const [savedWods] = useLocalStorage<SavedWod[]>('wod_admin_saved', []);
-  const [classes] = useLocalStorage<SavedClass[]>('admin_classes', []);
+  const [classes] = useLocalStorage<Class[]>('admin_classes', []);
   const [reservations] = useLocalStorage<ReservedWod[]>('reserved_wods', []);
   const today = getToday();
   const [selectedDate, setSelectedDate] = useState<string | null>(today);
@@ -60,7 +42,7 @@ export default function AdminHome() {
     };
   }, [reservations]);
 
-  const handleViewReservations = (classItem: SavedClass) => {
+  const handleViewReservations = (classItem: Class) => {
     window.location.href = `/admin/class/${classItem.id}`;
   };
 
@@ -120,23 +102,18 @@ export default function AdminHome() {
             </div>
           ) : (
             <div className="grid gap-3">
-              {todayClasses.map((classItem) => {
-                const wodTitle = getWodTitle(classItem.wodId);
-                const reservationCount = getReservationCount(classItem.wodId, classItem.date);
-
-                return (
-                  <ClassCard
-                    key={classItem.id}
-                    date={classItem.date}
-                    time={classItem.time}
-                    location={classItem.location}
-                    wodTitle={wodTitle}
-                    capacity={classItem.capacity}
-                    reservationCount={reservationCount}
-                    onViewReservations={() => handleViewReservations(classItem)}
-                  />
-                );
-              })}
+              {todayClasses.map((classItem) => (
+                <ClassCard
+                  key={classItem.id}
+                  date={classItem.date}
+                  time={classItem.time}
+                  location={classItem.location}
+                  wodTitle={getWodTitle(classItem.wodId)}
+                  capacity={classItem.capacity}
+                  reservationCount={getReservationCount(classItem.wodId, classItem.date)}
+                  onViewReservations={() => handleViewReservations(classItem)}
+                />
+              ))}
             </div>
           )}
         </div>

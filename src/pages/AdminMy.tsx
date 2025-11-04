@@ -1,15 +1,10 @@
 import { Link } from 'react-router';
+import { useMemo } from 'react';
 import { UserCard } from '@/components/cards/UserCard';
 import { SectionHeader } from '@/components/layout/SectionHeader';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-
-type User = {
-  email: string;
-  nickname: string;
-  role: 'member' | 'coach';
-};
+import type { User } from '@/types';
 
 export default function AdminMy() {
   const [allUsers] = useLocalStorage<User[]>('users', []);

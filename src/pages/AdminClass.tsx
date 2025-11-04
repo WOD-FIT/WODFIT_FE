@@ -5,17 +5,7 @@ import { ClassCard } from '@/components/cards/ClassCard';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { getToday } from '@/utils/date';
-
-type SavedClass = {
-  id: string;
-  date: string;
-  time: string;
-  location: string;
-  wodId: string;
-  capacity: number;
-};
-
-type ReservedWod = { wodId: string; date: string; userId?: string; userNickname?: string };
+import type { Class, ReservedWod, SavedWod } from '@/types';
 
 export default function AdminClass() {
   const [searchParams] = useSearchParams();
@@ -23,8 +13,8 @@ export default function AdminClass() {
   const [activeTab, setActiveTab] = useState<'register' | 'list'>(
     tabParam === 'list' ? 'list' : 'register',
   );
-  const [savedWods] = useLocalStorage<any[]>('wod_admin_saved', []);
-  const [classes, setClasses] = useLocalStorage<SavedClass[]>('admin_classes', []);
+  const [savedWods] = useLocalStorage<SavedWod[]>('wod_admin_saved', []);
+  const [classes, setClasses] = useLocalStorage<Class[]>('admin_classes', []);
   const [reservations] = useLocalStorage<ReservedWod[]>('reserved_wods', []);
   const [formData, setFormData] = useState({
     date: getToday(),
@@ -75,10 +65,6 @@ export default function AdminClass() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    console.log('Form data:', formData); // 디버깅용 로그
-
-    // 시간 유효성 검사
     if (!formData.time || formData.time.trim() === '') {
       alert('시간을 입력해주세요.');
       return;
@@ -101,7 +87,7 @@ export default function AdminClass() {
       return;
     }
 
-    const newClass: SavedClass = {
+    const newClass: Class = {
       id: crypto.randomUUID(),
       date: formData.date,
       time: formData.time,
@@ -110,20 +96,13 @@ export default function AdminClass() {
       capacity: Number(formData.capacity),
     };
 
-    console.log('New class:', newClass); // 디버깅용 로그
-
-    setClasses((prev) => {
-      const updated = [...prev, newClass];
-      console.log('Updated classes:', updated); // 디버깅용 로그
-      return updated;
-    });
+    setClasses((prev) => [...prev, newClass]);
 
     setFormData({ date: getToday(), time: '', location: '', wodId: '', capacity: '' });
     alert('수업이 등록되었습니다.');
   };
 
-  const handleViewReservations = (classItem: SavedClass) => {
-    // 홈 화면과 동일한 상세 페이지로 이동
+  const handleViewReservations = (classItem: Class) => {
     window.location.href = `/admin/class/${classItem.id}`;
   };
 
@@ -181,7 +160,6 @@ export default function AdminClass() {
               value={formData.time}
               onChange={(e) => {
                 const timeValue = e.target.value;
-                console.log('Time input value:', timeValue); // 디버깅용 로그
                 setFormData((prev) => ({ ...prev, time: timeValue }));
               }}
               className="w-full border rounded-lg px-3 py-2"

@@ -2,8 +2,7 @@ export const getFromStorage = <T>(key: string, defaultValue: T): T => {
   try {
     const item = localStorage.getItem(key);
     return item ? JSON.parse(item) : defaultValue;
-  } catch (error) {
-    console.error(`Error reading localStorage key "${key}":`, error);
+  } catch {
     return defaultValue;
   }
 };
@@ -11,23 +10,23 @@ export const getFromStorage = <T>(key: string, defaultValue: T): T => {
 export const setToStorage = <T>(key: string, value: T): void => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
-  } catch (error) {
-    console.error(`Error setting localStorage key "${key}":`, error);
+  } catch {
+    // localStorage 저장 실패 시 무시
   }
 };
 
 export const removeFromStorage = (key: string): void => {
   try {
     localStorage.removeItem(key);
-  } catch (error) {
-    console.error(`Error removing localStorage key "${key}":`, error);
+  } catch {
+    // localStorage 삭제 실패 시 무시
   }
 };
 
 export const clearStorage = (): void => {
   try {
     localStorage.clear();
-  } catch (error) {
-    console.error('Error clearing localStorage:', error);
+  } catch {
+    // localStorage 초기화 실패 시 무시
   }
 };

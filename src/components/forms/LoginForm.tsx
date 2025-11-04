@@ -38,15 +38,12 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       await login(email, password);
       const user = JSON.parse(localStorage.getItem('current_user') || '{}');
       const role = user?.role || 'member';
-      console.log('로그인 후 사용자:', user, '역할:', role);
 
-      // 약간의 지연을 두고 이동 (state 업데이트 보장)
       setTimeout(() => {
         navigate(role === 'coach' ? '/admin/home' : '/');
         onSuccess?.();
       }, 100);
     } catch (error: any) {
-      console.error('로그인 실패', error);
       const errorMessage =
         error?.message || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.';
       alert(errorMessage);

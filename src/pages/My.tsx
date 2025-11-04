@@ -19,13 +19,6 @@ export default function My() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // 페이지 마운트 시 한 번만 실행
-  useEffect(() => {
-    const savedWods = JSON.parse(localStorage.getItem('wods') || '[]');
-    console.log('My 페이지 마운트 - localStorage WOD 개수:', savedWods.length);
-    console.log('My 페이지 마운트 - Context WOD 개수:', wods.length);
-  }, []); // 빈 배열로 마운트 시 한 번만 실행
-
   // 최신 WOD 날짜 계산 (메모이제이션)
   const latestWodDate = useMemo(() => {
     if (wods.length === 0) return null;

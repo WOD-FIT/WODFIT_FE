@@ -1,37 +1,15 @@
-import { useParams, useNavigate, useSearchParams } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
+import { useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { useMemo } from 'react';
 import { formatDisplayDate } from '@/utils/date';
-
-type SavedClass = {
-  id: string;
-  date: string;
-  time: string;
-  location: string;
-  wodId: string;
-  capacity: number;
-};
-
-type SavedWod = {
-  id: string;
-  date: string;
-  title: string;
-  description: string;
-};
-
-type ReservedWod = {
-  wodId: string;
-  date: string;
-  userId: string;
-  userNickname: string;
-};
+import type { Class, SavedWod, ReservedWod } from '@/types';
 
 export default function AdminClassDetail() {
   const { classId } = useParams<{ classId: string }>();
   const navigate = useNavigate();
-  const [classes] = useLocalStorage<SavedClass[]>('admin_classes', []);
+  const [classes] = useLocalStorage<Class[]>('admin_classes', []);
   const [savedWods] = useLocalStorage<SavedWod[]>('wod_admin_saved', []);
   const [reservations] = useLocalStorage<ReservedWod[]>('reserved_wods', []);
 
