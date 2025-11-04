@@ -26,8 +26,8 @@ type ReservedWod = { wodId: string; date: string; userId?: string; userNickname?
 
 export default function AdminHome() {
   const [savedWods] = useLocalStorage<SavedWod[]>('wod_admin_saved', []);
-  const [classes, setClasses] = useLocalStorage<SavedClass[]>('admin_classes', []);
-  const [reservations, setReservations] = useLocalStorage<ReservedWod[]>('reserved_wods', []);
+  const [classes] = useLocalStorage<SavedClass[]>('admin_classes', []);
+  const [reservations] = useLocalStorage<ReservedWod[]>('reserved_wods', []);
 
   const todayClasses = useMemo(() => {
     const today = getToday();

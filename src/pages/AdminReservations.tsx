@@ -10,7 +10,7 @@ type ReservedWod = { wodId: string; date: string; userId: string; userNickname: 
 
 export default function AdminReservations() {
   const { savedWods } = useWod();
-  const [reservations, setReservations] = useLocalStorage<ReservedWod[]>('reserved_wods', []);
+  const [reservations] = useLocalStorage<ReservedWod[]>('reserved_wods', []);
   const [selectedDate, setSelectedDate] = useState(getToday());
 
   const getReservationsForDate = useMemo(() => {

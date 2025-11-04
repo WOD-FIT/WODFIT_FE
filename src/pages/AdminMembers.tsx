@@ -2,9 +2,7 @@ import { useState, useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { MemberCard } from '@/components/cards/MemberCard';
 import { WodCard } from '@/components/cards/WodCard';
-import { formatDisplayDate } from '@/utils/date';
 
 type User = {
   email: string;
@@ -33,7 +31,7 @@ export default function AdminMembers() {
   const memberWods = useMemo(() => {
     if (!selectedMember) return [];
     // 회원의 이메일로 WOD를 필터링 (실제로는 사용자 ID로 매칭해야 함)
-    return allWods.filter((wod) => {
+    return allWods.filter(() => {
       // 임시로 모든 WOD를 표시 (실제로는 사용자별 WOD 분리가 필요)
       return true;
     });

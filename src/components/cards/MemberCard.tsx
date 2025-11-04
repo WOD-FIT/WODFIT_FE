@@ -8,7 +8,7 @@ type MemberCardProps = {
 };
 
 export const MemberCard = ({
-  id,
+  id: _id,
   nickname,
   email,
   boxName,

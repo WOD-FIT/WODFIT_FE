@@ -1,12 +1,9 @@
 import { Link } from 'react-router';
-import { useAuth } from '@/hooks/useAuth';
 import { UserCard } from '@/components/cards/UserCard';
-import { StatsGrid } from '@/components/interactive/StatsGrid';
 import { SectionHeader } from '@/components/layout/SectionHeader';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { formatDisplayDate } from '@/utils/date';
 
 type User = {
   email: string;
@@ -15,7 +12,6 @@ type User = {
 };
 
 export default function AdminMy() {
-  const { user } = useAuth();
   const [allUsers] = useLocalStorage<User[]>('users', []);
   const [classes] = useLocalStorage<any[]>('admin_classes', []);
   const [reservations] = useLocalStorage<any[]>('reserved_wods', []);

@@ -7,9 +7,13 @@ type UserCardProps = {
   onLogout?: () => void;
 };
 
+type Profile = {
+  boxName?: string;
+};
+
 export const UserCard = ({ showLogout = true, onLogout }: UserCardProps) => {
   const { user, logout } = useAuth();
-  const [profile] = useLocalStorage('member_profile', {});
+  const [profile] = useLocalStorage<Profile>('member_profile', {});
 
   const handleLogout = () => {
     logout();
