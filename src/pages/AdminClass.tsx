@@ -1,11 +1,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useClassStore } from '@/stores/classStore';
+import { useReservationStore } from '@/stores/reservationStore';
+import { useWodStore } from '@/stores/wodStore';
 import { ClassCard } from '@/components/cards/ClassCard';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { getToday } from '@/utils/date';
-import type { Class, ReservedWod, SavedWod } from '@/types';
+import type { Class } from '@/types';
 
 export default function AdminClass() {
   const [searchParams] = useSearchParams();
@@ -13,9 +15,11 @@ export default function AdminClass() {
   const [activeTab, setActiveTab] = useState<'register' | 'list'>(
     tabParam === 'list' ? 'list' : 'register',
   );
-  const [savedWods] = useLocalStorage<SavedWod[]>('wod_admin_saved', []);
-  const [classes, setClasses] = useLocalStorage<Class[]>('admin_classes', []);
-  const [reservations] = useLocalStorage<ReservedWod[]>('reserved_wods', []);
+  const savedWods = useWodStore((state) => state.savedWods);
+  const classes = useClassStore((state) => state.classes);
+  const addClass = useClassStore((state) => state.addClass);
+  const deleteClass = useClassStore((state) => state.deleteClass);
+  const reservations = useReservationStore((state) => state.reservations);
   const [formData, setFormData] = useState({
     date: getToday(),
     time: '',
@@ -87,8 +91,7 @@ export default function AdminClass() {
       return;
     }
 
-    const newClass: Class = {
-      id: crypto.randomUUID(),
+    const newClass: Omit<Class, 'id'> = {
       date: formData.date,
       time: formData.time,
       location: formData.location,
@@ -96,7 +99,7 @@ export default function AdminClass() {
       capacity: Number(formData.capacity),
     };
 
-    setClasses((prev) => [...prev, newClass]);
+    addClass(newClass);
 
     setFormData({ date: getToday(), time: '', location: '', wodId: '', capacity: '' });
     alert('수업이 등록되었습니다.');
@@ -108,7 +111,7 @@ export default function AdminClass() {
 
   const handleDeleteClass = (classId: string) => {
     if (!confirm('이 수업을 삭제하시겠습니까?')) return;
-    setClasses((prev) => prev.filter((c) => c.id !== classId));
+    deleteClass(classId);
   };
 
   return (

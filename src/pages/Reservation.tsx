@@ -1,27 +1,22 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useClassStore } from '@/stores/classStore';
+import { useReservationStore } from '@/stores/reservationStore';
+import { useWodStore } from '@/stores/wodStore';
+import { useAuthStore } from '@/stores/authStore';
 import { Calendar } from '@/components/interactive/Calendar';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { getToday, formatDisplayDate } from '@/utils/date';
-
-type SavedClass = {
-  id: string;
-  date: string;
-  time: string;
-  location: string;
-  wodId: string;
-  capacity: number;
-};
-
-type SavedWod = { id: string; date: string; title: string; description: string };
-type ReservedWod = { wodId: string; date: string; userId?: string; userNickname?: string };
+import type { ReservedWod } from '@/types';
 
 export default function Reservation() {
   const [searchParams] = useSearchParams();
-  const [savedWods] = useLocalStorage<SavedWod[]>('wod_admin_saved', []);
-  const [classes] = useLocalStorage<SavedClass[]>('admin_classes', []);
-  const [reservedWods, setReservedWods] = useLocalStorage<ReservedWod[]>('reserved_wods', []);
+  const { user } = useAuthStore();
+  const savedWods = useWodStore((state) => state.savedWods);
+  const classes = useClassStore((state) => state.classes);
+  const reservations = useReservationStore((state) => state.reservations);
+  const addReservation = useReservationStore((state) => state.addReservation);
+  const removeReservation = useReservationStore((state) => state.removeReservation);
   const [selectedDate, setSelectedDate] = useState<string | null>(() => {
     // URL 파라미터에서 날짜 가져오기
     const dateParam = searchParams.get('date');
@@ -37,8 +32,7 @@ export default function Reservation() {
   }, [searchParams]);
 
   // 관리자는 예약할 수 없도록 체크
-  const currentUser = JSON.parse(localStorage.getItem('current_user') || '{}');
-  if (currentUser.role === 'coach') {
+  if (user?.role === 'coach') {
     return (
       <PageContainer>
         <h2 className="text-xl font-bold">수업 예약</h2>
@@ -68,34 +62,23 @@ export default function Reservation() {
 
   const reserveWod = (wodId: string) => {
     if (!confirm('이 수업을 예약하시겠습니까?')) return;
-    if (!selectedDate) return;
-    const currentUser = JSON.parse(localStorage.getItem('current_user') || '{}');
-    const newReserved = {
+    if (!selectedDate || !user) return;
+    
+    const newReserved: ReservedWod = {
       wodId,
       date: selectedDate,
-      userId: currentUser.email,
-      userNickname: currentUser.nickname || '닉네임 없음',
+      userId: user.email,
+      userNickname: user.nickname || '닉네임 없음',
     };
-    const next = [...reservedWods, newReserved];
-    setReservedWods(next);
+    addReservation(newReserved);
     alert('예약이 완료되었습니다!');
   };
 
   const cancelReservation = (wodId: string) => {
     if (!confirm('예약을 취소하시겠습니까?')) return;
+    if (!selectedDate || !user) return;
 
-    // 현재 날짜와 사용자 정보로 필터링하여 정확하게 취소
-    const currentUser = JSON.parse(localStorage.getItem('current_user') || '{}');
-    const next = reservedWods.filter((r) => {
-      // 같은 WOD ID이지만, 현재 사용자의 예약만 취소
-      if (r.wodId !== wodId) return true;
-      if (r.userId !== currentUser.email) return true;
-      return false;
-    });
-
-    setReservedWods(next);
-
-    // 성공 메시지
+    removeReservation(wodId, selectedDate, user.email);
     alert('예약이 취소되었습니다.');
   };
 
@@ -130,13 +113,14 @@ export default function Reservation() {
             <div className="grid gap-3">
               {dateClasses.map((classItem) => {
                 const wodInfo = getWodInfo(classItem.wodId);
-                const currentUser = JSON.parse(localStorage.getItem('current_user') || '{}');
-                const isReserved = reservedWods.some(
-                  (r) =>
-                    r.wodId === classItem.wodId &&
-                    r.date === classItem.date &&
-                    r.userId === currentUser.email,
-                );
+                const isReserved = user
+                  ? reservations.some(
+                      (r) =>
+                        r.wodId === classItem.wodId &&
+                        r.date === classItem.date &&
+                        r.userId === user.email,
+                    )
+                  : false;
 
                 if (!wodInfo) return null;
 

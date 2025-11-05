@@ -1,5 +1,5 @@
-import { useWod as useWodContext } from '@/context/WodContext';
+import { useWodStore } from '@/stores/wodStore';
 
 export const useWod = () => {
-  return useWodContext();
+  return useWodStore();
 };

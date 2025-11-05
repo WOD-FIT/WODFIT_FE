@@ -1,43 +1,30 @@
 import { Navigate } from 'react-router';
 import { useNavigate } from 'react-router';
-import { useAuth } from '@/hooks/useAuth';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useAuthStore } from '@/stores/authStore';
+import { useClassStore } from '@/stores/classStore';
+import { useReservationStore } from '@/stores/reservationStore';
+import { useWodStore } from '@/stores/wodStore';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { useMemo } from 'react';
 import { getToday, formatDisplayDate } from '@/utils/date';
-
-type SavedClass = {
-  id: string;
-  date: string;
-  time: string;
-  location: string;
-  wodId: string;
-  capacity: number;
-};
-
-type SavedWod = {
-  id: string;
-  date: string;
-  title: string;
-  description: string;
-};
-
-type ReservedWod = { wodId: string; date: string; userId?: string; userNickname?: string };
+import type { SavedWod } from '@/types';
 
 export default function Home() {
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, user } = useAuthStore();
   const navigate = useNavigate();
   const today = getToday();
-  const [savedWods] = useLocalStorage<SavedWod[]>('wod_admin_saved', []);
-  const [classes] = useLocalStorage<SavedClass[]>('admin_classes', []);
-  const [reservedWods] = useLocalStorage<ReservedWod[]>('reserved_wods', []);
+  
+  // Store에서 데이터 구독 (자동 리렌더링)
+  const savedWods = useWodStore((state) => state.savedWods);
+  const classes = useClassStore((state) => state.classes);
+  const reservations = useReservationStore((state) => state.reservations);
 
-  // 오늘 예약한 수업 목록
+  // 오늘 예약한 수업 목록 - Store Selector로 단순화
   const todayReservedClasses = useMemo(() => {
     if (!user) return [];
 
     // 오늘 날짜의 예약 찾기 (userId로 필터링)
-    const todayReservations = reservedWods.filter(
+    const todayReservations = reservations.filter(
       (r) => r.date === today && r.userId === user.email,
     );
 
@@ -47,16 +34,14 @@ export default function Home() {
     const reservedWodIds = new Set(todayReservations.map((r) => r.wodId));
 
     // 오늘 날짜의 수업 중 예약된 수업 필터링
-    const filtered = classes.filter((classItem) => {
+    return classes.filter((classItem) => {
       const isToday = classItem.date === today;
       const isReserved = reservedWodIds.has(classItem.wodId);
       return isToday && isReserved;
     });
+  }, [classes, reservations, user, today]);
 
-    return filtered;
-  }, [classes, reservedWods, user, today]);
-
-  // 오늘 등록된 모든 수업의 WOD 목록 (중복 제거)
+  // 오늘 등록된 모든 수업의 WOD 목록 (중복 제거) - Store Selector로 단순화
   const todayWods = useMemo(() => {
     const todayClasses = classes.filter((c) => c.date === today);
     const wodIds = [...new Set(todayClasses.map((c) => c.wodId))];
