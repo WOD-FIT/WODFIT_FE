@@ -4,6 +4,7 @@ import { useClassStore } from '@/stores/classStore';
 import { useReservationStore } from '@/stores/reservationStore';
 import { useWodStore } from '@/stores/wodStore';
 import { useAuthStore } from '@/stores/authStore';
+import { useNotificationStore } from '@/stores/notificationStore';
 import { Calendar } from '@/components/interactive/Calendar';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { getToday, formatDisplayDate } from '@/utils/date';
@@ -17,6 +18,7 @@ export default function Reservation() {
   const reservations = useReservationStore((state) => state.reservations);
   const addReservation = useReservationStore((state) => state.addReservation);
   const removeReservation = useReservationStore((state) => state.removeReservation);
+  const addNotification = useNotificationStore((state) => state.addNotification);
   const [selectedDate, setSelectedDate] = useState<string | null>(() => {
     // URL 파라미터에서 날짜 가져오기
     const dateParam = searchParams.get('date');
@@ -60,17 +62,22 @@ export default function Reservation() {
     };
   }, [savedWods]);
 
-  const reserveWod = (wodId: string) => {
+  const reserveWod = (classItem: (typeof classes)[number]) => {
     if (!confirm('이 수업을 예약하시겠습니까?')) return;
     if (!selectedDate || !user) return;
-    
+
     const newReserved: ReservedWod = {
-      wodId,
+      wodId: classItem.wodId,
       date: selectedDate,
       userId: user.email,
       userNickname: user.nickname || '닉네임 없음',
     };
     addReservation(newReserved);
+    addNotification({
+      message: `${user.nickname || user.email}님이 수업을 예약했습니다!`,
+      link: '/admin/class?tab=list',
+      target: 'coach',
+    });
     alert('예약이 완료되었습니다!');
   };
 
@@ -156,7 +163,7 @@ export default function Reservation() {
                         </button>
                       ) : (
                         <button
-                          onClick={() => reserveWod(classItem.wodId)}
+                          onClick={() => reserveWod(classItem)}
                           className="px-4 h-9 rounded-lg bg-[#63461E] text-white"
                         >
                           예약하기

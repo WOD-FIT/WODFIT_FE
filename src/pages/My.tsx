@@ -20,16 +20,21 @@ export default function My() {
   const [searchTerm, setSearchTerm] = useState('');
 
   // 최신 WOD 날짜 계산 (메모이제이션)
+  const myWods = useMemo(() => {
+    if (!user) return [];
+    return wods.filter((wod) => wod.userId === user.email);
+  }, [wods, user]);
+
   const latestWodDate = useMemo(() => {
-    if (wods.length === 0) return null;
-    const sortedWods = [...wods].sort((a, b) => (b.date > a.date ? 1 : -1));
+    if (myWods.length === 0) return null;
+    const sortedWods = [...myWods].sort((a, b) => (b.date > a.date ? 1 : -1));
     return sortedWods[0].date;
-  }, [wods]);
+  }, [myWods]);
 
   // 기록 관리 탭에서 날짜 자동 선택 로직
   useEffect(() => {
     if (activeTab === 'manage') {
-      if (wods.length === 0) {
+      if (myWods.length === 0) {
         // WOD가 없으면 selectedDate를 null로 유지
         if (selectedDate !== null) {
           setSelectedDate(null);
@@ -39,7 +44,7 @@ export default function My() {
 
       // 오늘 날짜에 WOD가 있으면 오늘 날짜 우선 선택
       const today = getToday();
-      const hasTodayWod = wods.some((wod) => wod.date === today);
+      const hasTodayWod = myWods.some((wod) => wod.date === today);
 
       if (hasTodayWod) {
         if (selectedDate !== today) {
@@ -49,7 +54,7 @@ export default function My() {
       }
 
       // selectedDate가 null이거나 해당 날짜에 WOD가 없으면 최신 WOD 날짜 선택
-      if (!selectedDate || !wods.some((wod) => wod.date === selectedDate)) {
+      if (!selectedDate || !myWods.some((wod) => wod.date === selectedDate)) {
         if (latestWodDate && selectedDate !== latestWodDate) {
           setSelectedDate(latestWodDate);
         }
@@ -83,13 +88,13 @@ export default function My() {
 
   // 기록 관리 탭용 필터링
   const markedDates = useMemo(() => {
-    return wods.map((wod) => wod.date);
-  }, [wods]);
+    return myWods.map((wod) => wod.date);
+  }, [myWods]);
 
   const selectedDateWods = useMemo(() => {
     if (!selectedDate) return [];
-    return wods.filter((wod) => wod.date === selectedDate);
-  }, [wods, selectedDate]);
+    return myWods.filter((wod) => wod.date === selectedDate);
+  }, [myWods, selectedDate]);
 
   const filteredWods = useMemo(() => {
     if (!searchTerm) return selectedDateWods;
@@ -139,13 +144,13 @@ export default function My() {
       {/* 나의 WOD 기록 탭 */}
       {activeTab === 'records' && (
         <div className="mt-4">
-          {wods.length === 0 ? (
+          {myWods.length === 0 ? (
             <p className="text-sm text-gray-500 dark:text-gray-400">
               아직 WOD 기록이 없습니다. 기록을 추가해보세요.
             </p>
           ) : (
             <div className="flex flex-col gap-4">
-              {wods.map((wod, index) => {
+              {myWods.map((wod, index) => {
                 // 홀수번째(1, 3, 5...): #Interval, #Run
                 // 짝수번째(2, 4, 6...): #Metcon, #Barbell
                 // index는 0부터 시작하므로 1을 더해서 계산

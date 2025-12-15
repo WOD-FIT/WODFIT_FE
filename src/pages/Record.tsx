@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useWod } from '@/hooks/useWod';
 import { getToday } from '@/utils/date';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function Record() {
   const [text, setText] = useState('');
@@ -12,6 +13,7 @@ export default function Record() {
   const [searchParams] = useSearchParams();
   const mode = searchParams.get('mode'); // 'class' 또는 null
   const { addWod } = useWod();
+  const { user } = useAuthStore();
 
   useEffect(() => {
     const initializeForm = () => {
@@ -116,6 +118,11 @@ export default function Record() {
       return;
     }
 
+    if (!user) {
+      alert('로그인 후 이용해주세요.');
+      return;
+    }
+
     // 텍스트 입력 검증
     if (!text.trim()) {
       alert('WOD 내용을 입력해주세요.');
@@ -171,6 +178,8 @@ export default function Record() {
         time,
         exercises,
         tags: finalTags,
+        userId: user.email,
+        userNickname: user.nickname,
       };
 
       const edit = localStorage.getItem('edit_wod');
@@ -191,7 +200,7 @@ export default function Record() {
 
         if (existingWod) {
           // 실제로 수정할 WOD가 있는 경우에만 수정 처리
-          const updatedRecord = { ...newRecord, id: editId };
+          const updatedRecord = { ...existingWod, ...newRecord, id: editId };
           const next = prev.map((w: any) => (w.id === editId ? updatedRecord : w));
 
           localStorage.setItem('wods', JSON.stringify(next));

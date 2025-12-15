@@ -15,6 +15,8 @@ export interface WodEntry {
   time: { min: string; sec: string };
   exercises: { name: string; weight: string }[];
   tags?: string[];
+  userId?: string;
+  userNickname?: string;
 }
 
 export interface SavedWod {
@@ -56,4 +58,3 @@ export interface Profile {
 }
 
 export type TabType = 'register' | 'list' | 'records' | 'manage';
-

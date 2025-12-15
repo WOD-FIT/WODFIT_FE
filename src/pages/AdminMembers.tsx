@@ -16,11 +16,7 @@ export default function AdminMembers() {
 
   const memberWods = useMemo(() => {
     if (!selectedMember) return [];
-    // 회원의 이메일로 WOD를 필터링 (실제로는 사용자 ID로 매칭해야 함)
-    return allWods.filter(() => {
-      // 임시로 모든 WOD를 표시 (실제로는 사용자별 WOD 분리가 필요)
-      return true;
-    });
+    return allWods.filter((wod: any) => wod.userId === selectedMember.email);
   }, [allWods, selectedMember]);
 
   const handleMemberSelect = (member: User) => {

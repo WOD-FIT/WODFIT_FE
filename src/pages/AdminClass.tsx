@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
 import { useClassStore } from '@/stores/classStore';
+import { useNotificationStore } from '@/stores/notificationStore';
 import { useReservationStore } from '@/stores/reservationStore';
 import { useWodStore } from '@/stores/wodStore';
 import { ClassCard } from '@/components/cards/ClassCard';
@@ -10,7 +11,7 @@ import { getToday } from '@/utils/date';
 import type { Class } from '@/types';
 
 export default function AdminClass() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState<'register' | 'list'>(
     tabParam === 'list' ? 'list' : 'register',
@@ -20,6 +21,7 @@ export default function AdminClass() {
   const addClass = useClassStore((state) => state.addClass);
   const deleteClass = useClassStore((state) => state.deleteClass);
   const reservations = useReservationStore((state) => state.reservations);
+  const addNotification = useNotificationStore((state) => state.addNotification);
   const [formData, setFormData] = useState({
     date: getToday(),
     time: '',
@@ -100,8 +102,15 @@ export default function AdminClass() {
     };
 
     addClass(newClass);
+    addNotification({
+      message: '새로운 수업이 등록되었습니다!',
+      link: '/reservation',
+      target: 'member',
+    });
 
     setFormData({ date: getToday(), time: '', location: '', wodId: '', capacity: '' });
+    setActiveTab('list');
+    setSearchParams({ tab: 'list' });
     alert('수업이 등록되었습니다.');
   };
 

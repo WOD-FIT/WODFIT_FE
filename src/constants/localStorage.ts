@@ -15,5 +15,5 @@ export const STORAGE_KEYS = {
   SELECTED_WOD_FOR_CLASS: 'selected_wod_for_class',
   PREF_NOTIF: 'pref_notif',
   PREF_NOTIF_TIME: 'pref_notif_time',
+  NOTIFICATIONS: 'notifications',
 } as const;
-
