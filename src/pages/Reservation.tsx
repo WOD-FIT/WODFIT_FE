@@ -86,6 +86,11 @@ export default function Reservation() {
     if (!selectedDate || !user) return;
 
     removeReservation(wodId, selectedDate, user.email);
+    addNotification({
+      message: `${user.nickname || user.email}님이 수업 예약을 취소했습니다!`,
+      link: '/admin/class?tab=list',
+      target: 'coach',
+    });
     alert('예약이 취소되었습니다.');
   };
 

@@ -6,25 +6,25 @@ import { useNotificationStore } from '@/stores/notificationStore';
 export default function Header() {
   const { user } = useAuth();
   const notifications = useNotificationStore((state) => state.notifications);
-  const markAllReadForTarget = useNotificationStore((state) => state.markAllReadForTarget);
+  const markAllReadForUser = useNotificationStore((state) => state.markAllReadForUser);
   const [isOpen, setIsOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement | null>(null);
   const role = user?.role || 'member';
+  const userId = user?.email || '';
 
   const roleDisplay = useMemo(() => {
     if (!user?.role) return null;
     return user.role === 'coach' ? 'Coach' : 'Member';
   }, [user?.role]);
 
-  const visibleNotifications = useMemo(
-    () => notifications.filter((n) => n.target === role),
-    [notifications, role],
-  );
+  const visibleNotifications = useMemo(() => {
+    return notifications.filter((n) => n.target === role);
+  }, [notifications, role]);
 
-  const hasUnreadForRole = useMemo(
-    () => visibleNotifications.some((n) => !n.read),
-    [visibleNotifications],
-  );
+  const hasUnreadForRole = useMemo(() => {
+    if (!userId) return false;
+    return visibleNotifications.some((n) => !(n.readBy || []).includes(userId));
+  }, [visibleNotifications, userId]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -42,8 +42,8 @@ export default function Header() {
   const handleToggleNotification = () => {
     setIsOpen((prev) => {
       const next = !prev;
-      if (!prev) {
-        markAllReadForTarget(role as 'member' | 'coach');
+      if (!prev && userId) {
+        markAllReadForUser(role as 'member' | 'coach', userId);
       }
       return next;
     });

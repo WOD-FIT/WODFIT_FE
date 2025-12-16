@@ -9,8 +9,8 @@ type NotificationItem = {
   message: string;
   link?: string;
   createdAt: string;
-  read: boolean;
   target: NotificationTarget;
+  readBy: string[]; // 읽은 사용자(email) 목록
 };
 
 type NotificationState = {
@@ -20,9 +20,9 @@ type NotificationState = {
     link?: string;
     target: NotificationTarget;
   }) => void;
-  markAllReadForTarget: (target: NotificationTarget) => void;
+  markAllReadForUser: (target: NotificationTarget, userId: string) => void;
   clear: () => void;
-  hasUnreadForTarget: (target: NotificationTarget) => boolean;
+  hasUnreadForUser: (target: NotificationTarget, userId: string) => boolean;
 };
 
 const createLegacyStorage = (key: string) => {
@@ -47,23 +47,27 @@ export const useNotificationStore = create<NotificationState>()(
           message,
           link,
           createdAt: new Date().toISOString(),
-          read: false,
           target,
+          readBy: [],
         };
 
         set((state) => ({
           notifications: [newItem, ...state.notifications].slice(0, 20),
         }));
       },
-      markAllReadForTarget: (target) =>
+      markAllReadForUser: (target, userId) =>
         set((state) => ({
           notifications: state.notifications.map((n) =>
-            n.target === target ? { ...n, read: true } : n,
+            n.target === target && userId
+              ? { ...n, readBy: Array.from(new Set([...(n.readBy || []), userId])) }
+              : n,
           ),
         })),
       clear: () => set({ notifications: [] }),
-      hasUnreadForTarget: (target) =>
-        get().notifications.some((n) => n.target === target && !n.read),
+      hasUnreadForUser: (target, userId) =>
+        get().notifications.some(
+          (n) => n.target === target && !!userId && !(n.readBy || []).includes(userId),
+        ),
     }),
     {
       name: STORAGE_KEYS.NOTIFICATIONS,
