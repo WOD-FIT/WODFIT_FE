@@ -102,8 +102,9 @@ export default function AdminClass() {
     };
 
     addClass(newClass);
+    const wodTitle = savedWods.find((w) => w.id === formData.wodId)?.title || '수업';
     addNotification({
-      message: '새로운 수업이 등록되었습니다!',
+      message: `새로운 수업 "${wodTitle}"이 등록되었습니다!`,
       link: '/reservation',
       target: 'member',
     });

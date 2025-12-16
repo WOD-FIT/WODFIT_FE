@@ -73,8 +73,10 @@ export default function Reservation() {
       userNickname: user.nickname || '닉네임 없음',
     };
     addReservation(newReserved);
+    const wodInfo = getWodInfo(classItem.wodId);
+    const wodTitle = wodInfo?.title || '수업';
     addNotification({
-      message: `${user.nickname || user.email}님이 수업을 예약했습니다!`,
+      message: `${user.nickname || user.email}님이 수업 "${wodTitle}"을 예약했습니다!`,
       link: '/admin/class?tab=list',
       target: 'coach',
     });
@@ -86,8 +88,10 @@ export default function Reservation() {
     if (!selectedDate || !user) return;
 
     removeReservation(wodId, selectedDate, user.email);
+    const wodInfo = getWodInfo(wodId);
+    const wodTitle = wodInfo?.title || '수업';
     addNotification({
-      message: `${user.nickname || user.email}님이 수업 예약을 취소했습니다!`,
+      message: `${user.nickname || user.email}님이 수업 "${wodTitle}" 예약을 취소했습니다!`,
       link: '/admin/class?tab=list',
       target: 'coach',
     });
