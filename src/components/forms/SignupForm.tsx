@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { signup } from '@/api/auth';
+import { useUserStore } from '@/stores/userStore';
 import { isValidEmail, isValidPassword, isValidNickname } from '@/utils/validator';
 
 type SignupFormProps = {
@@ -17,6 +18,7 @@ export const SignupForm = ({ onSuccess }: SignupFormProps) => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
+  const addUser = useUserStore((state) => state.addUser);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -48,6 +50,13 @@ export const SignupForm = ({ onSuccess }: SignupFormProps) => {
 
     try {
       await signup(formData.email, formData.password, formData.nickname, formData.role);
+      // userStore에 사용자 추가
+      addUser({
+        email: formData.email,
+        password: formData.password,
+        nickname: formData.nickname,
+        role: formData.role,
+      });
       alert('회원가입이 완료되었습니다!');
       navigate('/auth/login');
       onSuccess?.();

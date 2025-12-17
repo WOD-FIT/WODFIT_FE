@@ -31,6 +31,18 @@ export default function AdminReservations() {
   const totalReservations = reservations.length;
   const todayReservations = getReservationsForDate(selectedDate);
 
+  // localStorage의 users도 확인 (기존 사용자 지원)
+  const getLegacyUser = useMemo(() => {
+    return (email: string) => {
+      try {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        return users.find((u: any) => u.email === email);
+      } catch {
+        return null;
+      }
+    };
+  }, []);
+
   const stats = useMemo(
     () => [
       { title: '총 예약 수', value: totalReservations },
@@ -66,9 +78,15 @@ export default function AdminReservations() {
           <ul className="grid gap-2">
             {todayReservations.map((reservation, index) => {
               const user = reservation.userId ? getUser(reservation.userId) : null;
-              const displayNickname = user?.nickname || reservation.userNickname || reservation.userId || '닉네임 없음';
+              const legacyUser = reservation.userId ? getLegacyUser(reservation.userId) : null;
+              const displayNickname =
+                user?.nickname ||
+                legacyUser?.nickname ||
+                reservation.userNickname ||
+                reservation.userId ||
+                '닉네임 없음';
               const displayEmail = reservation.userId || '이메일 없음';
-              
+
               return (
                 <li key={index} className="border rounded-lg p-3 bg-white">
                   <div className="flex items-center gap-3">
@@ -78,12 +96,8 @@ export default function AdminReservations() {
                       className="w-8 h-8 rounded-full object-cover"
                     />
                     <div className="flex-1">
-                      <div className="font-semibold text-black">
-                        {displayNickname}
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        {displayEmail}
-                      </div>
+                      <div className="font-semibold text-black">{displayNickname}</div>
+                      <div className="text-xs text-gray-600">{displayEmail}</div>
                     </div>
                     <div className="text-sm text-gray-700">{getWodTitle(reservation.wodId)}</div>
                   </div>

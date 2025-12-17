@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserStore } from '@/stores/userStore';
 import { isValidEmail, isValidPassword } from '@/utils/validator';
 import { useNavigate } from 'react-router';
 
@@ -13,6 +14,8 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const { login } = useAuth();
   const navigate = useNavigate();
+  const addUser = useUserStore((state) => state.addUser);
+  const getUser = useUserStore((state) => state.getUser);
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -38,6 +41,24 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       await login(email, password);
       const user = JSON.parse(localStorage.getItem('current_user') || '{}');
       const role = user?.role || 'member';
+
+      // userStore에 사용자가 없으면 localStorage의 users에서 가져와서 추가
+      if (!getUser(email)) {
+        try {
+          const users = JSON.parse(localStorage.getItem('users') || '[]');
+          const foundUser = users.find((u: any) => u.email === email);
+          if (foundUser) {
+            addUser({
+              email: foundUser.email,
+              password: foundUser.password,
+              nickname: foundUser.nickname,
+              role: foundUser.role || 'member',
+            });
+          }
+        } catch {
+          // 무시
+        }
+      }
 
       setTimeout(() => {
         navigate(role === 'coach' ? '/admin/home' : '/');

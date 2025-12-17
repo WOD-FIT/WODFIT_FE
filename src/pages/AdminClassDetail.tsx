@@ -29,6 +29,18 @@ export default function AdminClassDetail() {
     return reservations.filter((r) => r.wodId === classItem.wodId && r.date === classItem.date);
   }, [reservations, classItem]);
 
+  // localStorage의 users도 확인 (기존 사용자 지원)
+  const getLegacyUser = useMemo(() => {
+    return (email: string) => {
+      try {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        return users.find((u: any) => u.email === email);
+      } catch {
+        return null;
+      }
+    };
+  }, []);
+
   if (!classItem) {
     return (
       <PageContainer>
@@ -119,9 +131,15 @@ export default function AdminClassDetail() {
             <div className="space-y-3">
               {classReservations.map((reservation, index) => {
                 const user = reservation.userId ? getUser(reservation.userId) : null;
-                const displayNickname = user?.nickname || reservation.userNickname || reservation.userId || '닉네임 없음';
+                const legacyUser = reservation.userId ? getLegacyUser(reservation.userId) : null;
+                const displayNickname =
+                  user?.nickname ||
+                  legacyUser?.nickname ||
+                  reservation.userNickname ||
+                  reservation.userId ||
+                  '닉네임 없음';
                 const displayEmail = reservation.userId || '이메일 없음';
-                
+
                 return (
                   <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <img
@@ -130,12 +148,8 @@ export default function AdminClassDetail() {
                       className="w-10 h-10 rounded-full object-cover"
                     />
                     <div className="flex-1">
-                      <div className="font-medium text-black">
-                        {displayNickname}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {displayEmail}
-                      </div>
+                      <div className="font-medium text-black">{displayNickname}</div>
+                      <div className="text-sm text-gray-600">{displayEmail}</div>
                     </div>
                     <div className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
                       예약완료
@@ -162,4 +176,3 @@ export default function AdminClassDetail() {
     </PageContainer>
   );
 }
-
