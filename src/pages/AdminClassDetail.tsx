@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router';
 import { useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useUserStore } from '@/stores/userStore';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { formatDisplayDate } from '@/utils/date';
@@ -12,6 +13,7 @@ export default function AdminClassDetail() {
   const [classes] = useLocalStorage<Class[]>('admin_classes', []);
   const [savedWods] = useLocalStorage<SavedWod[]>('wod_admin_saved', []);
   const [reservations] = useLocalStorage<ReservedWod[]>('reserved_wods', []);
+  const getUser = useUserStore((state) => state.getUser);
 
   const classItem = useMemo(() => {
     return classes.find((c) => c.id === classId);
@@ -115,26 +117,32 @@ export default function AdminClassDetail() {
             <p className="text-sm text-gray-500 text-center py-4">예약자가 없습니다.</p>
           ) : (
             <div className="space-y-3">
-              {classReservations.map((reservation, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <img
-                    src="/icons/profile.jpg"
-                    alt="프로필 이미지"
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                  <div className="flex-1">
-                    <div className="font-medium text-black">
-                      {reservation.userNickname || '닉네임 없음'}
+              {classReservations.map((reservation, index) => {
+                const user = reservation.userId ? getUser(reservation.userId) : null;
+                const displayNickname = user?.nickname || reservation.userNickname || reservation.userId || '닉네임 없음';
+                const displayEmail = reservation.userId || '이메일 없음';
+                
+                return (
+                  <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <img
+                      src="/icons/profile.jpg"
+                      alt="프로필 이미지"
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium text-black">
+                        {displayNickname}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {displayEmail}
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-600">
-                      {reservation.userId || '이메일 없음'}
+                    <div className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
+                      예약완료
                     </div>
                   </div>
-                  <div className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
-                    예약완료
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
